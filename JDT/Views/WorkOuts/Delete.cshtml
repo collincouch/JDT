@@ -1,0 +1,45 @@
+@model JDT.Models.WorkOut
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>WorkOut</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">@Model.Name</div>
+
+    <div class="display-label">Description</div>
+    <div class="display-field">@Model.Description</div>
+
+    <div class="display-label">DateCreated</div>
+    <div class="display-field">@String.Format("{0:g}", Model.DateCreated)</div>
+
+    <div class="display-label">DateModified</div>
+    <div class="display-field">@String.Format("{0:g}", Model.DateModified)</div>
+
+    <div class="display-label">Plans</div>
+    <div class="display-field">@(Model.Plans == null ? "None" : Model.Plans.Count.ToString())</div>
+
+    <div class="display-label">Tasks</div>
+    <div class="display-field">@(Model.Exercises == null ? "None" : Model.Exercises.Count.ToString())</div>
+</fieldset>
+@using (Html.BeginForm("Delete", "Workouts", new { id1 = ViewBag.PlanId }, FormMethod.Post, new { @class = "form-horizontal" })) 
+{ 
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index", new {id=ViewBag.PlanId })
+    </p>
+}
+@section scripts{
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/dashboard/jqueryplugins")
+    @Scripts.Render("~/bundles/backboneunderscore")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/site")
+}
+

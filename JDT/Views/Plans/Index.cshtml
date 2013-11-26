@@ -1,0 +1,103 @@
+@model IEnumerable<JDT.Models.Plan>
+
+@{
+    ViewBag.Title = "Plans";
+}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Your Plans<small>View, Create, Edit from here.</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10">
+            <section class="widget">
+                <header>
+                    <h4>
+                        <i class="fa fa-list-alt"></i>
+                        Plans
+                    </h4>
+                </header>
+                <div class="body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="hidden-xs-portrait">
+                                    #
+                                </th>
+                                <th>
+                                    Name
+                                </th>
+                                <th class="hidden-xs">
+                                    Description
+                                </th>
+                                <th class="hidden-xs">
+                                    Date Created
+                                </th>
+                                <th>
+                                    #Workouts
+                                </th>
+                                <th>
+                                    #Diets
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{int x = 1;}
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="hidden-xs-portrait">
+                                        @x
+                                    </td>
+                                    <td>
+                                        @item.Name
+                                    </td>
+                                    <td class="hidden-xs">
+                                        @item.Description
+                                    </td>
+                                    <td class="hidden-xs">
+                                        @Html.DisplayFor(m=>item.DateCreated)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink(item.WorkOuts == null ? "None" : item.WorkOuts.Count.ToString(), "Index", "WorkOuts", new { id = item.PlanId }, null)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink(item.Diets == null ? "None" : item.Diets.Count.ToString(), "Index", "Diets", new { id = item.PlanId }, null)
+                                    </td>
+                                    <td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="location.href = '@Url.Action("Edit", new {id=item.PlanId})'">
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-inverse" onclick="location.href = '@Url.Action("Details",new { id = item.PlanId })'">
+                                            Details
+                                        </button>
+                                        <button class="btn btn-sm btn-warning" onclick="location.href = '@Url.Action("Delete", new { id = item.PlanId })'">
+                                            Delete
+                                        </button>
+                                    </td>
+                                    
+                                </tr>
+                                x+=1;
+                            }
+                        </tbody>
+                    </table>
+                    <blockquote>
+                        <button class="btn btn-default btn-sm" onclick="location.href='@Url.Action("Create")'">
+                            Add New
+                        </button>
+                    </blockquote>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+@section scripts{
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/dashboard/jqueryplugins")
+@Scripts.Render("~/bundles/backboneunderscore")
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/site")
+}

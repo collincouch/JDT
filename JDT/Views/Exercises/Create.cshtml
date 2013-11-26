@@ -1,0 +1,49 @@
+@model JDT.Models.Exercise
+
+@{
+    ViewBag.Title = "Create";
+}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Create your exercise<small> Give your exercise a name and description.</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <section class="widget">
+                <header>
+                    <h4>
+                        <i class="fa fa-align-left"></i>
+                        Exercise Creation
+                    </h4>
+                </header>
+                <div class="body">
+                    @using (Html.BeginForm("Create", "Exercises", new { id = ViewBag.WorkOutId }, FormMethod.Post, new { @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate" }))
+                    {
+                        @Html.ValidationSummary(true)
+                        <fieldset>
+                            <legend class="section">Give your exercise a name and description</legend>
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    @Html.Partial("_CreateOrEdit", Model)
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-danger">Submit</button>
+                            <button type="button" class="btn btn-default" onclick="location.href='@Url.Action("Index", new {id=ViewBag.WorkOutId })'">Back to List</button>
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+    </div>
+    @section scripts{
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryplugins")
+        @Scripts.Render("~/bundles/backboneunderscore")
+        @Scripts.Render("~/bundles/bootstrap")
+        @Scripts.Render("~/bundles/site")
+    }
+
