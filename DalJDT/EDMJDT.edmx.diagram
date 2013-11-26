@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="c9c5f74b3b574545af596813da0299ce" Name="Diagram1">
+        <EntityTypeShape EntityType="JDTModel.Diet" Width="1.5" PointX="0.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="JDTModel.Ingredient" Width="1.5" PointX="2.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="JDTModel.JdtTask" Width="1.5" PointX="4.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="JDTModel.Meal" Width="1.5" PointX="6.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="JDTModel.Plan" Width="1.5" PointX="3" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="JDTModel.PreConsumer" Width="1.5" PointX="5.25" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="JDTModel.UserProfile" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="JDTModel.WorkOut" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="JDTModel.FK_dbo_Plans_dbo_UserProfiles_AuthorId" ManuallyRouted="false" />
+        <AssociationConnector Association="JDTModel.FK_dbo_PreConsumers_dbo_Plans_Plan_PlanId" ManuallyRouted="false" />
+        <AssociationConnector Association="JDTModel.FK_dbo_PreConsumers_dbo_UserProfiles_ContentAuthorId" ManuallyRouted="false" />
+        <AssociationConnector Association="JDTModel.FK_dbo_UserProfiles_dbo_UserProfiles_ContentAuthorId" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

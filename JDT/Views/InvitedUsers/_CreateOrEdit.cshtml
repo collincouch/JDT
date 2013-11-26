@@ -1,0 +1,21 @@
+@model JDT.Models.InvitedUser
+
+@* This partial view defines form fields that will appear when creating and editing entities *@
+<div class="control-group">
+    @Html.LabelFor(model => model.FirstName, new { @class = "control-label" })
+    <div class="controls form-group">
+        @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control parsley-validated", required = "required" })
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.LastName, new { @class = "control-label" })
+    <div class="controls form-group">
+        @Html.TextBoxFor(model => model.LastName, new { @class = "form-control parsley-validated", required = "required" })
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.Email, new { @class = "control-label" })
+    <div class="controls form-group">
+        @Html.TextBoxFor(model => model.Email, new { @class = "form-control parsley-validated", required = "required" })
+    </div>
+</div>

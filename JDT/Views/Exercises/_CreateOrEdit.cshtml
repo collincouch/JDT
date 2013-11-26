@@ -1,0 +1,57 @@
+@model JDT.Models.Exercise
+
+@* This partial view defines form fields that will appear when creating and editing entities *@
+<div class="control-group">
+    @Html.LabelFor(model => model.Name, new { @class = "control-label" })
+    <div class="controls form-group">
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control parsley-validated", placeholder = "Name your workout", required = "required" })
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.Description, new { @class = "control-label", @for = "elastic-textarea" })
+    <div class="controls form-group">
+        @Html.TextAreaFor(model => model.Description, new { @class = "autogrow form-control", id = "elastic-textarea", placeholder = "Add your description here", style = "height:130px;" })
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.RecMinSets, new { @class = "control-label" })
+    <div class="controls form-group">
+        <div class="col-sm-2">
+            @Html.TextBoxFor(model => model.RecMinSets, new { @class = "form-control parsley-validated", id = "minsets", name = "minsets", data_trigger = "change", data_validation_minlength = "1", required = "required", data_range = "[1,100]" })
+        </div>
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.RecMaxSets, new { @class = "control-label" })
+    <div class="controls form-group">
+        <div class="col-sm-2">
+            @Html.TextBoxFor(model => model.RecMaxSets, new { @class = "form-control parsley-validated", id = "maxsets", name = "maxsets", data_trigger = "change", data_validation_minlength = "1", required = "required", data_range = "[1,100]" })
+        </div>
+
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.RecMinReps, new { @class = "control-label" })
+    <div class="controls form-group">
+        <div class="col-sm-2">
+            @Html.TextBoxFor(model => model.RecMinReps, new { @class = "form-control parsley-validated", id = "minreps", name = "minreps", data_trigger = "change", data_validation_minlength = "1", required = "required", data_range = "[1,100]" })
+        </div>
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.RecMaxReps, new { @class = "control-label" })
+    <div class="controls form-group">
+        <div class="col-sm-2">
+            @Html.TextBoxFor(model => model.RecMaxReps, new { @class = "form-control parsley-validated", id = "maxreps", name = "maxreps", data_trigger = "change", data_validation_minlength = "1", required = "required", data_range = "[1,100]" })
+        </div>
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.RecDuration, new { @class = "control-label" })
+    <div class="controls form-group">
+        <div class="col-sm-2">
+            @Html.TextBoxFor(model => model.RecDuration, new { @class = "form-control parsley-validated", placeholder = "Duration" })
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,47 @@
+@model JDT.Models.Plan
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Plan</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">@Model.Name</div>
+
+    <div class="display-label">Description</div>
+    <div class="display-field">@Model.Description</div>
+
+    <div class="display-label">DateCreated</div>
+    <div class="display-field">@String.Format("{0:g}", Model.DateCreated)</div>
+
+    <div class="display-label">DateModified</div>
+    <div class="display-field">@String.Format("{0:g}", Model.DateModified)</div>
+
+    <div class="display-label">Author</div>
+    <div class="display-field">@(Model.Creator == null ? "None" : Model.Creator.LastName)</div>
+
+    <div class="display-label">WorkOuts</div>
+    <div class="display-field">@(Model.WorkOuts == null ? "None" : Model.WorkOuts.Count.ToString())</div>
+
+    <div class="display-label">Diets</div>
+    <div class="display-field">@(Model.Diets == null ? "None" : Model.Diets.Count.ToString())</div>
+
+    <div class="display-label">PreConsumers</div>
+    <div class="display-field">@(Model.InvitedUsers == null ? "None" : Model.InvitedUsers.Count.ToString())</div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.PlanId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+@section scripts{
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/dashboard/jqueryplugins")
+    @Scripts.Render("~/bundles/backboneunderscore")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/site")
+}
+

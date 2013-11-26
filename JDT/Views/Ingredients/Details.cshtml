@@ -1,0 +1,40 @@
+@model JDT.Models.Ingredient
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Ingredient</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">@Model.Name</div>
+
+    <div class="display-label">Description</div>
+    <div class="display-field">@Model.Description</div>
+
+    <div class="display-label">DateCreated</div>
+    <div class="display-field">@String.Format("{0:g}", Model.DateCreated)</div>
+
+    <div class="display-label">DateModified</div>
+    <div class="display-field">@String.Format("{0:g}", Model.DateModified)</div>
+
+    <div class="display-label">Meals</div>
+    <div class="display-field">@(Model.Recipes == null ? "None" : Model.Recipes.Count.ToString())</div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.IngredientId, id1 = ViewBag.MealId }) |
+    @Html.ActionLink("Back to List", "Index", new { id = ViewBag.MealId })
+</p>
+
+@section scripts{
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/dashboard/jqueryplugins")
+    @Scripts.Render("~/bundles/backboneunderscore")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/site")
+}
+
+

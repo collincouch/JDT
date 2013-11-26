@@ -1,0 +1,60 @@
+﻿@model JDT.Models.LoginModel
+@{
+    ViewBag.Title = "Log in";
+}
+<div class="content container" >
+    <section class="widget login-widget">
+        <header class="text-align-center">
+            <h4>Login to your account</h4>
+        </header>
+        <div class="body">
+            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "no-margin", data_validate = "parsley", novalidate = "novalidate" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <fieldset>
+                    <div class="form-group no-margin">
+                        @Html.LabelFor(m => m.Email)
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-addon">
+                                <i class="eicon-user"></i>
+                            </span>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control  input-lg parsley-validated", required = "required", data_trigger = "change", type = "email", placeholder = "Your Email" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Password)
+
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-addon">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control  input-lg parsley-validated", required="required", type = "password", placeholder = "Your Password" })
+
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-block btn-lg btn-danger">
+                        <span class="small-circle"><i class="fa fa-caret-right"></i></span>
+                        <small>Sign In</small>
+                    </button>
+                    <div class="forgot"><a class="forgot" href="#">Forgot Username or Password?</a></div>
+                </div>
+            }
+        </div>
+        <footer>
+            <div class="facebook-login">
+                <a href="index.html"><span><i class="fa fa-facebook-square fa-lg"></i> LogIn with Facebook</span></a>
+            </div>
+        </footer>
+    </section>
+
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryplugins")
+    @Scripts.Render("~/bundles/backboneunderscore")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/site")
+}

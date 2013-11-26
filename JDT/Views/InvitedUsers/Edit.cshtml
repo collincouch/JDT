@@ -1,0 +1,51 @@
+@model JDT.Models.InvitedUser
+
+@{
+    ViewBag.Title = "Edit";
+}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Edit Friend<small>  Remember to send the registration email on the friend list page after adding him or her.</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <section class="widget">
+                <header>
+                    <h4>
+                        <i class="fa fa-align-left"></i>
+                        Modify Friend
+                    </h4>
+                </header>
+                <div class="body">
+                    @using (Html.BeginForm("Edit", "InvitedUsers", FormMethod.Post, new { @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate" }))
+                    {
+                        <fieldset>
+                            <legend class="section">Modify Friend</legend>
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    @Html.HiddenFor(model => model.InvitedUserId)
+                                    @Html.Partial("_CreateOrEdit", Model)
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-danger">Submit</button>
+                            <button type="button" class="btn btn-default" onclick="location.href='@Url.Action("Index")'">Back to List</button>
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryplugins")
+    @Scripts.Render("~/bundles/backboneunderscore")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/site")
+}

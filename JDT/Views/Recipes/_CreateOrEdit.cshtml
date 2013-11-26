@@ -1,0 +1,17 @@
+@model JDT.Models.Recipe
+
+@* This partial view defines form fields that will appear when creating and editing entities *@
+<div class="control-group">
+    @Html.LabelFor(model => model.Name, new { @class = "control-label" })
+    <div class="controls form-group">
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control parsley-validated", placeholder = "Name your meal", required = "required" })
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.Description, new { @class = "control-label", @for = "elastic-textarea" })
+    <div class="controls form-group">
+        @Html.TextAreaFor(model => model.Description, new { @class = "autogrow form-control", id = "elastic-textarea", placeholder = "Add your description here", style = "height:130px;" })
+    </div>
+</div>
+
+

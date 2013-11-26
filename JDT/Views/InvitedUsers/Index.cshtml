@@ -1,0 +1,104 @@
+@model IEnumerable<JDT.Models.InvitedUser>
+
+@{
+    ViewBag.Title = "Index";
+}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Your Friends<small>View, Create, Edit from here.</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10">
+            <section class="widget">
+                <header>
+                    <h4>
+                        <i class="fa fa-list-alt"></i>
+                        Friend List
+                    </h4>
+                </header>
+                <div class="body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="hidden-xs-portrait">
+                                    #
+                                </th>
+                                <th>
+                                    First Name
+                                </th>
+                                <th>
+                                    Last Name
+                                </th>
+                                <th>
+                                    Email
+                                </th>
+                                <th class="hidden-xs">
+                                    Date Created
+                                </th>
+                                <th>
+                                    Send Registration Email
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{int x = 1;}
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="hidden-xs-portrait">
+                                        @x
+                                    </td>
+                                    <td>
+                                        @item.FirstName
+                                    </td>
+                                    <td>
+                                        @item.LastName
+                                    </td>
+                                    <td>
+                                        @item.Email
+                                    </td>
+                                    <td class="hidden-xs">
+                                        @Html.DisplayFor(m => item.DateCreated)
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-inverse" onclick="location.href = '#' ">
+                                            Invite
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="location.href = '@Url.Action("Edit", new {id=item.InvitedUserId})'">
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-inverse" onclick="location.href = '@Url.Action("Details",new { id = item.InvitedUserId })'">
+                                            Details
+                                        </button>
+                                        <button class="btn btn-sm btn-warning" onclick="location.href = '@Url.Action("Delete", new { id = item.InvitedUserId })'">
+                                            Delete
+                                        </button>
+                                    </td>
+
+                                </tr>
+                                x += 1;
+                            }
+                        </tbody>
+                    </table>
+                    <blockquote>
+                        <button class="btn btn-default btn-sm" onclick="location.href='@Url.Action("Create")'">
+                            Add New
+                        </button>
+                    </blockquote>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/dashboard/jqueryplugins")
+    @Scripts.Render("~/bundles/backboneunderscore")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/site")
+}
