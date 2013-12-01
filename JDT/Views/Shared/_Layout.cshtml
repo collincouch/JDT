@@ -8,7 +8,53 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <meta charset="utf-8">
+        <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+        <script src="https://cdn.firebase.com/v0/firebase-simple-login.js"></script>
         @Styles.Render("~/Content/css/bundles")
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/fireBase")
+        <script>
+            var auth1;
+            var jdtRef1 = new Firebase('https://jdt.firebaseio.com');
+            $(document).ready(function () {
+                $(document).on("click", "#logOut", function () {
+                    auth1.logout();
+                    //console.log("signing out");
+                    //window.location.replace("../Account/Login");
+                });
+            
+
+            
+            });
+
+            function initializeAuth(callback) {
+                console.log('Initializing Auth from Layout');
+                auth1 = new FirebaseSimpleLogin(jdtRef1, function (error, user) {
+                    if (error) {
+                        switch (error.code) {
+                            case 'INVALID_EMAIL':
+                                console.log(error.code);
+                            case 'INVALID_PASSWORD':
+                                console.log(error.code);
+                            default:
+                                console.log(error.code);
+
+                        }
+                    } else if (user) {
+                        // user authenticated with Firebase
+                        console.log('User is authorized: User ID: ' + user.id + ', Email: ' + user.email + ', Provider: ' + user.provider);
+                        callback(user.email);
+
+
+                    } else {
+                        //console.log('invalid uid/pwd');
+                        window.location.replace("../Account/Login");
+                    }
+
+                });
+            }
+        </script>
+
     </head>
     <body class style>
         <div class="logo">
@@ -23,6 +69,7 @@
             @RenderBody()
         </div>
         @RenderSection("scripts", required: false)
+        
         <script type="text/template" id="settings-template">
             <div class="setting clearfix">
                 <div>Background</div>

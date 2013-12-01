@@ -1,6 +1,8 @@
 ﻿@model JDT.Models.LoginModel
 @{
+    
     ViewBag.Title = "Log in";
+    Layout = "~/Views/Shared/_LayoutUnAuth.cshtml";
 }
 <div class="content container" >
     <section class="widget login-widget">
@@ -8,7 +10,7 @@
             <h4>Login to your account</h4>
         </header>
         <div class="body">
-            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "no-margin", data_validate = "parsley", novalidate = "novalidate" }))
+            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "no-margin", data_validate = "parsley", novalidate = "novalidate", id="Login" }))
             {
                 @Html.AntiForgeryToken()
                 @Html.ValidationSummary(true)
@@ -57,4 +59,22 @@
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+    @Scripts.Render("~/bundles/firebase")
+
+    <script>
+
+        $('#Login').submit(function (event) {
+            event.preventDefault();
+            initializeSimpleLogin(function (email) {
+                if (email)
+                    window.location.replace("../Dashboard");
+                else
+                    auth.login('password', {
+                        email: $('#Email').val(),
+                        password: $('#Password').val()
+                    });
+            });
+           
+        })
+    </script>
 }

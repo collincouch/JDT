@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_LayoutUnAuth.cshtml";
 }
 <div class="content container">
     <div class="row">
@@ -65,7 +66,6 @@
     </div>
 </div>
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/dashboard/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")

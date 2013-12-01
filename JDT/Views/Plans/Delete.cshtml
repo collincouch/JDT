@@ -1,4 +1,3 @@
-@model JDT.Models.Plan
 
 @{
     ViewBag.Title = "Delete";
@@ -11,40 +10,46 @@
     <legend>Plan</legend>
 
     <div class="display-label">Name</div>
-    <div class="display-field">@Model.Name</div>
+    <div class="display-field" id="Name"></div>
 
     <div class="display-label">Description</div>
-    <div class="display-field">@Model.Description</div>
+    <div class="display-field" id="Description"></div>
 
     <div class="display-label">DateCreated</div>
-    <div class="display-field">@String.Format("{0:g}", Model.DateCreated)</div>
+    <div class="display-field" id="DateCreated"></div>
 
     <div class="display-label">DateModified</div>
-    <div class="display-field">@String.Format("{0:g}", Model.DateModified)</div>
+    <div class="display-field" id="DateModified"></div>
 
     <div class="display-label">Author</div>
-    <div class="display-field">@(Model.Creator == null ? "None" : Model.Creator.LastName)</div>
+    <div class="display-field" id="Author"></div>
 
     <div class="display-label">WorkOuts</div>
-    <div class="display-field">@(Model.WorkOuts == null ? "None" : Model.WorkOuts.Count.ToString())</div>
+    <div class="display-field" id="WorkOuts"></div>
 
     <div class="display-label">Diets</div>
-    <div class="display-field">@(Model.Diets == null ? "None" : Model.Diets.Count.ToString())</div>
+    <div class="display-field" id="Diets"></div>
 
-    <div class="display-label">PreConsumers</div>
-    <div class="display-field">@(Model.InvitedUsers == null ? "None" : Model.InvitedUsers.Count.ToString())</div>
-</fieldset>
-@using (Html.BeginForm()) {
+
+   </fieldset>
+@using (Html.BeginForm("Delete","Plans",FormMethod.Post,new {id="Delete"})) {
     <p>
         <input type="submit" value="Delete" /> |
-        @Html.ActionLink("Back to List", "Index")
+        <a href="#" id="List">Back to List</a>
     </p>
 }
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/dashboard/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+@Scripts.Render("~/Content/js/CrudOps/Plans.js")
+
+<script>
+    $(document).ready(function () {
+        initDetailsAuth();
+    });
+
+</script>
 }
 

@@ -8,6 +8,11 @@ namespace JDT
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
+
+            bundles.Add(new ScriptBundle("~/bundles/fireBase").Include(
+                        "~/Content/js/fireBaseAuth.js"));
+           
+
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Content/js/libs/jquery/jquery-{version}.js"));
 

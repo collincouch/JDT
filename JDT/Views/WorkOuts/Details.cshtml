@@ -10,32 +10,36 @@
     <legend>WorkOut</legend>
 
     <div class="display-label">Name</div>
-    <div class="display-field">@Model.Name</div>
+    <div class="display-field" id="Name"></div>
 
     <div class="display-label">Description</div>
-    <div class="display-field">@Model.Description</div>
+    <div class="display-field" id="Description"></div>
 
     <div class="display-label">DateCreated</div>
-    <div class="display-field">@String.Format("{0:g}", Model.DateCreated)</div>
+    <div class="display-field" id="DateCreated"></div>
 
     <div class="display-label">DateModified</div>
-    <div class="display-field">@String.Format("{0:g}", Model.DateModified)</div>
+    <div class="display-field" id="DateModified"></div>
 
-    <div class="display-label">Plans</div>
-    <div class="display-field">@(Model.Plans == null ? "None" : Model.Plans.Count.ToString())</div>
-
-    <div class="display-label">Tasks</div>
-    <div class="display-field">@(Model.Exercises == null ? "None" : Model.Exercises.Count.ToString())</div>
+    <div class="display-label">Exercises</div>
+    <div class="display-field" id="Exercises"></div>
 </fieldset>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id=Model.WorkOutId,id1=ViewBag.PlanId }) |
-    @Html.ActionLink("Back to List", "Index", new {id=ViewBag.PlanId })
+    <a href="#" id="EditDetails">Edit</a> |
+    <a href="#" id="List">Back to List</a>
 </p>
 
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/dashboard/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+@Scripts.Render("~/Content/js/CrudOps/WorkOuts.js")
+
+<script>
+    $(document).ready(function () {
+        initDetailsAuth();
+    });
+
+</script>
 }

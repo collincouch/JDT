@@ -7,8 +7,7 @@ using System.Web.Mvc;
 
 namespace JDT.Controllers
 {
-    [LocsAuthorizeAttribute]
-    [SessionExpireFilterAttribute]
+   
     public class DashboardController : Controller
     {
         //

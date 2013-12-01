@@ -19,7 +19,7 @@
                     </h4>
                 </header>
                 <div class="body">
-                    @using (Html.BeginForm("Edit", "Workouts", new { id = ViewBag.PlanId }, FormMethod.Post, new { @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate" }))
+                    @using (Html.BeginForm("Edit", "Workouts", FormMethod.Post, new {id="Edit", @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate" }))
                     {
                         @Html.ValidationSummary(true)
                         <fieldset>
@@ -49,4 +49,14 @@
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+@Scripts.Render("~/Content/js/CrudOps/WorkOuts.js")
+
+<script>
+    $(document).ready(function () {
+        initEditAuth();
+    });
+
+</script>
+
+
 }

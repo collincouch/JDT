@@ -588,7 +588,19 @@
     </div>
 </div>
 @section scripts{
-@Scripts.Render("~/bundles/jquery")
+<script>
+    $(document).ready(function () {
+
+        initializeAuth(function (email) {
+            setHeader(email);
+
+        });
+
+
+    });
+
+</script>
+
 @Scripts.Render("~/bundles/dashboard/jqueryplugins")
 @Scripts.Render("~/bundles/nvd3")
 @Scripts.Render("~/bundles/nvd3models")
@@ -597,6 +609,7 @@
 @Scripts.Render("~/bundles/site")
 <script src="~/Content/js/index.js"></script>
 <script src="~/Content/js/chat.js"></script>
+
 <script type="text/template" id="message-template">
     <div class="sender pull-left">
         <div class="icon">
@@ -661,4 +674,7 @@
     </button>
     <% } %>
 </script>
+
+
+
     }

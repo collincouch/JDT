@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>44304</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -56,6 +56,12 @@
     </Reference>
     <Reference Include="DotNetOpenAuth.OpenId.RelyingParty">
       <HintPath>..\packages\DotNetOpenAuth.OpenId.RelyingParty.4.3.3.13295\lib\net45-full\DotNetOpenAuth.OpenId.RelyingParty.dll</HintPath>
+    </Reference>
+    <Reference Include="FirebaseTokenGenerator">
+      <HintPath>..\packages\FirebaseTokenGenerator.1.0.3.0\lib\net35\FirebaseTokenGenerator.dll</HintPath>
+    </Reference>
+    <Reference Include="JWT">
+      <HintPath>..\packages\JWT.1.3.2\lib\3.5\JWT.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Web.WebPages.OAuth, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -314,6 +320,7 @@
     <Content Include="Content\js\calendar.js" />
     <Content Include="Content\js\chat.js" />
     <Content Include="Content\js\fileupload.js" />
+    <Content Include="Content\js\fireBaseAuth.js" />
     <Content Include="Content\js\forms-elemets.js" />
     <Content Include="Content\js\forms.js" />
     <Content Include="Content\js\grid-live.js" />
@@ -461,6 +468,8 @@
     <Content Include="Content\js\ui-buttons.js" />
     <Content Include="Content\js\ui-dialogs.js" />
     <Content Include="Content\js\wizard.js" />
+    <Content Include="Content\js\CrudOps\Plans.js" />
+    <Content Include="Content\js\CrudOps\WorkOuts.js" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -503,6 +512,7 @@
     <Content Include="Content\js\libs\modernizr-2.6.2.js" />
     <Content Include="Content\js\libs\underscore.js" />
     <Content Include="Content\js\libs\underscore.min.js" />
+    <Content Include="Scripts\typings\firebase\firebase.d.ts" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -593,6 +603,9 @@
     <Content Include="Views\InvitedUsers\Details.cshtml" />
     <Content Include="Views\InvitedUsers\Index.cshtml" />
     <Content Include="Views\InvitedUsers\_CreateOrEdit.cshtml" />
+    <Content Include="Views\Account\View1.cshtml" />
+    <Content Include="Views\Shared\_LayoutUnAuth.cshtml" />
+    <Content Include="Views\Home\View1.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -635,7 +648,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>50276</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:49250/</IISUrl>
+          <IISUrl>https://localhost:44304/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

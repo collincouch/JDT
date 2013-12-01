@@ -9,12 +9,13 @@ using JDT.Models;
 using WebMatrix.WebData;
 using MvcSiteMapProvider;
 using JDT.App_Code;
+using System.Web.Security;
 
 namespace JDT.Controllers
 {
-    [LocsAuthorizeAttribute]
-    [SessionExpireFilterAttribute]
-    [Authorize(Roles = "Administrator,ContentCreator")]
+    //[LocsAuthorizeAttribute]
+    //[SessionExpireFilterAttribute]
+    //[Authorize(Roles = "Administrator,ContentCreator")]
     public class PlansController : Controller
     {
         private JDTContext context = new JDTContext();
@@ -24,11 +25,7 @@ namespace JDT.Controllers
         [MvcSiteMapNode(Title = "Plans", ParentKey = "Dashboard")]
         public ViewResult Index()
         {
-            ViewBag.IsDashboardActive = "";
-            ViewBag.IsManagePlans = "active";
-            int uid = WebSecurity.CurrentUserId;
-            return View(context.Plans.Where(plan => plan.CreatorId == uid).
-                Include(plan => plan.WorkOuts).Include(plan=>plan.Diets).ToList());
+            return View();
 
         }
 
@@ -36,10 +33,12 @@ namespace JDT.Controllers
         // GET: /Plans/Details/5
 
         [MvcSiteMapNode(Title = "Details", ParentKey = "Plan")]
-        public ViewResult Details(int id)
+        public ViewResult Details(string id)
         {
-            Plan plan = context.Plans.Single(x => x.PlanId == id);
-            return View(plan);
+            //Plan plan = context.Plans.Single(x => x.PlanId == id);
+            //return View(plan);
+
+            return View();
         }
 
         //
@@ -47,75 +46,39 @@ namespace JDT.Controllers
         [MvcSiteMapNode(Title = "Add", ParentKey = "Plan")]
         public ActionResult Create()
         {
+            //string email = WebSecurity.CurrentUserName;
+            //UserProfile usr = context.UserProfile.SingleOrDefault(up => up.Email == email);
+            //ViewBag.UserName = usr.UserName;
             return View();
         } 
 
-        //
-        // POST: /Plans/Create
-
-        [HttpPost]
-        public ActionResult Create(Plan plan)
-        {
-            if (ModelState.IsValid)
-            {
-                plan.CreatorId = WebSecurity.CurrentUserId;
-                context.Plans.Add(plan);
-                context.SaveChanges();
-                return RedirectToAction("Index");  
-            }
-
-            return View(plan);
-        }
+       
         
         //
         // GET: /Plans/Edit/5
         [MvcSiteMapNode(Title = "Edit", ParentKey = "Plan")]
-        public ActionResult Edit(int id)
+        public ActionResult Edit(string id)
         {
-            Plan plan = context.Plans.Single(x => x.PlanId == id);
-            return View(plan);
+            //Plan plan = context.Plans.Single(x => x.PlanId == id);
+            //return View(plan);
+
+            return View();
+            
         }
 
-        //
-        // POST: /Plans/Edit/5
-
-        [HttpPost]
-        public ActionResult Edit(Plan plan)
-        {
-            if (ModelState.IsValid)
-            {
-
-                plan.CreatorId = WebSecurity.CurrentUserId;
-                plan.DateModified = DateTime.Now;
-                context.Entry(plan).State = EntityState.Modified;
-                context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-           
-            return View(plan);
-        }
-
+       
         //
         // GET: /Plans/Delete/5
 
         [MvcSiteMapNode(Title = "Delete", ParentKey = "Plan")]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string id)
         {
-            Plan plan = context.Plans.Single(x => x.PlanId == id);
-            return View(plan);
+            //Plan plan = context.Plans.Single(x => x.PlanId == id);
+            //return View(plan);
+            return View();
         }
 
-        //
-        // POST: /Plans/Delete/5
-
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Plan plan = context.Plans.Single(x => x.PlanId == id);
-            context.Plans.Remove(plan);
-            context.SaveChanges();
-            return RedirectToAction("Index");
-        }
+       
 
         protected override void Dispose(bool disposing)
         {

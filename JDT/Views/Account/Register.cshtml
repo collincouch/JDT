@@ -17,7 +17,7 @@
                     </h4>
                 </header>
                 <div class="body">
-                    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal label-left", data_validate="parsley", novalidate="novalidate" }))
+                    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal label-left", id="Register", data_validate="parsley", novalidate="novalidate" }))
                     {
                         @Html.AntiForgeryToken()
                         @Html.ValidationSummary(true)
@@ -75,9 +75,79 @@
 
 
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+
+    <script>
+        $("#Register").submit(function (event) {
+            
+            event.preventDefault();
+            
+            initializeSimpleLogin(function (email) {
+                if (email){
+                    // user authenticated with Firebase
+                    console.log('User ID: ' + user.id + ', Email: ' + user.email + ', Provider: ' + user.provider);
+                    window.location.replace("../Dashboard");
+
+                } else {
+                    //console.log('invalid uid/pwd');
+                    auth.createUser($("#Email").val(), $("#Password").val(), function (error, user) {
+                        if (!error) {
+                            var user = createUserObject();
+                            window.location.replace("../Dashboard");
+                        }
+                        else {
+                            // an error occurred while attempting login
+                            console.log('error' + error);
+                            switch (error.code) {
+                                case 'INVALID_EMAIL':
+                                    console.log(error.code);
+                                case 'INVALID_PASSWORD':
+                                    console.log(error.code);
+                                default:
+                                    console.log(error.code);
+                            }
+                            return;
+                        }
+                    });
+
+                }
+
+            });
+
+
+
+
+           
+            
+        });
+        
+
+        function createUserObject() {
+            console.log('createUserObject');
+            //var fb = new Firebase("https://jdt.firebaseio.com/Users/");
+            var userName = $("#UserName").val();
+            var firstName = $("#FirstName").val();
+            var lastName = $("#LastName").val();
+            var email = $("#Email").val();
+            try {
+                createNewUser({
+                    "UserName": userName,
+                    "Name": {
+                        "First": firstName,
+                        "Last": lastName
+                    },
+                    "Email": email
+
+                });
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+
+       
+    </script>
 }
