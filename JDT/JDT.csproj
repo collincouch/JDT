@@ -319,6 +319,10 @@
     <Content Include="Content\js\app.js" />
     <Content Include="Content\js\calendar.js" />
     <Content Include="Content\js\chat.js" />
+    <Content Include="Content\js\CrudOps\Ingredients.js" />
+    <Content Include="Content\js\CrudOps\Recipes.js" />
+    <Content Include="Content\js\CrudOps\Exercises.js" />
+    <Content Include="Content\js\CrudOps\Diets.js" />
     <Content Include="Content\js\fileupload.js" />
     <Content Include="Content\js\fireBaseAuth.js" />
     <Content Include="Content\js\forms-elemets.js" />

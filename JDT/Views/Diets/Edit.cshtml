@@ -19,7 +19,7 @@
                     </h4>
                 </header>
                 <div class="body">
-                    @using (Html.BeginForm("Edit", "Diets", new { id = ViewBag.PlanId }, FormMethod.Post, new { @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate" }))
+                    @using (Html.BeginForm("Edit", "Diets", FormMethod.Post, new { @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate", id="Edit" }))
                     {
                         @Html.ValidationSummary(true)
                         <fieldset>
@@ -33,7 +33,7 @@
                         </fieldset>
                         <div class="form-actions">
                             <button type="submit" class="btn btn-danger">Submit</button>
-                            <button type="button" class="btn btn-default" onclick="location.href='@Url.Action("Index", new { id=ViewBag.PlanId })'">Back to List</button>
+                            <a href="#" id="List">Back to List</a>
                         </div>
                     }
                 </div>
@@ -44,9 +44,17 @@
 
 </div>
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+@Scripts.Render("~/Content/js/CrudOps/Diets.js")
+
+<script>
+    $(document).ready(function () {
+        initEditAuth();
+    });
+
+</script>
+
 }

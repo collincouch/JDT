@@ -19,7 +19,7 @@
                     </h4>
                 </header>
                 <div class="body">
-                    @using (Html.BeginForm("Create", "Diets", new { id = ViewBag.PlanId }, FormMethod.Post, new { @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate" }))
+                    @using (Html.BeginForm("Create", "Diets",FormMethod.Post, new { @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate", id="Create" }))
                     {
                         @Html.ValidationSummary(true)
                         <fieldset>
@@ -43,9 +43,17 @@
 
 </div>
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
+   
     @Scripts.Render("~/bundles/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+@Scripts.Render("~/Content/js/CrudOps/Diets.js")
+
+<script>
+    $(document).ready(function () {
+        initCreateAuth();
+    });
+
+</script>
 }

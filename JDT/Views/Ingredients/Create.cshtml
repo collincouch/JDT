@@ -20,7 +20,7 @@
                     </h4>
                 </header>
                 <div class="body">
-                    @using (Html.BeginForm("Create", "Ingredients", new { id = ViewBag.MealId }, FormMethod.Post, new { @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate" }))
+                    @using (Html.BeginForm("Create", "Ingredients", FormMethod.Post, new {id="Create", @class = "form-horizontal", data_validate = "parsley", novalidate = "novalidate" }))
                     {
                         @Html.ValidationSummary(true)
                         <fieldset>
@@ -33,7 +33,7 @@
                         </fieldset>
                         <div class="form-actions">
                             <button type="submit" class="btn btn-danger">Submit</button>
-                            <button type="button" class="btn btn-default" onclick="location.href='@Url.Action("Index", new {id=ViewBag.MealId })'">Back to List</button>
+                            <button type="button" class="btn btn-default" onclick="location.href='@Url.Action("Index", new {id=ViewBag.WorkOutId })'">Back to List</button>
                         </div>
                     }
                 </div>
@@ -42,11 +42,19 @@
     </div>
 </div>
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
+ 
     @Scripts.Render("~/bundles/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+@Scripts.Render("~/Content/js/CrudOps/Ingredients.js")
+
+<script>
+    $(document).ready(function () {
+        initCreateAuth();
+    });
+
+</script>
 }
 
 

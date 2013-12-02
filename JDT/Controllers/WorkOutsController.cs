@@ -23,7 +23,7 @@ namespace JDT.Controllers
         //
         // GET: /WorkOuts/
 
-        [MvcSiteMapNode(Title = "Workouts", ParentKey = "Plan")]
+        [MvcSiteMapNode(Title = "Diet", ParentKey = "Plan", PreservedRouteParameters = "id")]
         public ViewResult Index(string id)
         {
             //int uid = WebSecurity.CurrentUserId;
@@ -66,23 +66,14 @@ namespace JDT.Controllers
         // GET: /WorkOuts/Edit/5
 
         [MvcSiteMapNode(Title = "Edit", ParentKey = "WorkOut")]
-        public ActionResult Edit(string id, string id1)
+        public ActionResult Edit(string id, string id1, string id2)
         {
             //ViewBag.PlanId = Convert.ToString(id1);
             //WorkOut workout = context.WorkOuts.Single(x => x.WorkOutId == id);
             return View();
         }
 
-        //
-        // POST: /WorkOuts/Edit/5
-
-        [HttpPost]
-        public ActionResult Edit(string id)
-        {
-           
-            
-            return View();
-        }
+       
 
         //
         // GET: /WorkOuts/Delete/5

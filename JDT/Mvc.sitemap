@@ -14,7 +14,7 @@
         <mvcSiteMapNode title="Edit" controller="Workouts" action="Edit"/>
         <mvcSiteMapNode title="Details" controller="Workouts" action="Details"/>
         <mvcSiteMapNode title="Delete" controller="Workouts" action="Delete"/>
-        <mvcSiteMapNode title="Exercises" controller="Exercises" action="Index" preservedRouteParameters="id" key="Exercise">
+        <mvcSiteMapNode title="Exercises" controller="Exercises" action="Index" preservedRouteParameters="id, id1" key="Exercise">
           <mvcSiteMapNode title="Add" controller="Exercises" action="Create"/>
           <mvcSiteMapNode title="Edit" controller="Exercises" action="Edit"/>
           <mvcSiteMapNode title="Details" controller="Exercises" action="Details"/>
@@ -26,12 +26,12 @@
         <mvcSiteMapNode title="Edit" controller="Diets" action="Edit"/>
         <mvcSiteMapNode title="Details" controller="Diets" action="Details"/>
         <mvcSiteMapNode title="Delete" controller="Diets" action="Delete"/>
-        <mvcSiteMapNode title="Recipes" controller="Recipes" action="Index" preservedRouteParameters="id" key="Recipe">
+        <mvcSiteMapNode title="Recipes" controller="Recipes" action="Index" preservedRouteParameters="id, id1" key="Recipe">
           <mvcSiteMapNode title="Add" controller="Recipes" action="Create"/>
           <mvcSiteMapNode title="Edit" controller="Recipes" action="Edit"/>
           <mvcSiteMapNode title="Details" controller="Recipes" action="Details"/>
           <mvcSiteMapNode title="Delete" controller="Recipes" action="Delete"/>
-          <mvcSiteMapNode title="Ingredients" controller="Ingredients" action="Index" preservedRouteParameters="id" key="Ingredient">
+          <mvcSiteMapNode title="Ingredients" controller="Ingredients" action="Index" preservedRouteParameters="id, id1, id2" key="Ingredient">
             <mvcSiteMapNode title="Add" controller="Ingredients" action="Create"/>
             <mvcSiteMapNode title="Edit" controller="Ingredients" action="Edit"/>
             <mvcSiteMapNode title="Details" controller="Ingredients" action="Details"/>

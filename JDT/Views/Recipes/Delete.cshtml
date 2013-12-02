@@ -11,36 +11,41 @@
     <legend>Meal</legend>
 
     <div class="display-label">Name</div>
-    <div class="display-field">@Model.Name</div>
+    <div class="display-field" id="Name"></div>
 
     <div class="display-label">Description</div>
-    <div class="display-field">@Model.Description</div>
+    <div class="display-field" id="Description"></div>
 
     <div class="display-label">DateCreated</div>
-    <div class="display-field">@String.Format("{0:g}", Model.DateCreated)</div>
+    <div class="display-field" id="DateCreated"></div>
 
     <div class="display-label">DateModified</div>
-    <div class="display-field">@String.Format("{0:g}", Model.DateModified)</div>
-
-    <div class="display-label">Diets</div>
-    <div class="display-field">@(Model.Diets == null ? "None" : Model.Diets.Count.ToString())</div>
+    <div class="display-field" id="DateModified"></div>
 
     <div class="display-label">Ingredients</div>
-    <div class="display-field">@(Model.Ingredients == null ? "None" : Model.Ingredients.Count.ToString())</div>
+    <div class="display-field" id="Ingredients"></div>
 </fieldset>
-@using (Html.BeginForm("Delete", "Meals", new { id1 = ViewBag.DietId }, FormMethod.Post, new { @class = "form-horizontal" }))
+@using (Html.BeginForm("Delete", "Meals", FormMethod.Post, new { id="Delete", @class = "form-horizontal" }))
 {
     <p>
         <input type="submit" value="Delete" /> |
-        @Html.ActionLink("Back to List", "Index", new { id = ViewBag.MealId })
+        <a href="#" id="List">Back to List</a>
     </p>
 }
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
+
     @Scripts.Render("~/bundles/dashboard/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+@Scripts.Render("~/Content/js/CrudOps/Recipes.js")
+
+<script>
+    $(document).ready(function () {
+        initDetailsAuth();
+    });
+
+</script>
 }
 
 

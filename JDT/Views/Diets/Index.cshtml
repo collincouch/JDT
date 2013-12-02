@@ -36,50 +36,17 @@
                                     Date Created
                                 </th>
                                 <th>
-                                    #Meals
+                                    #Recipes
                                 </th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @{int x = 1;}
-                            @foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td class="hidden-xs-portrait">
-                                        @x
-                                    </td>
-                                    <td>
-                                        @item.Name
-                                    </td>
-                                    <td class="hidden-xs">
-                                        @item.Description
-                                    </td>
-                                    <td class="hidden-xs">
-                                        @Html.DisplayFor(m => item.DateCreated)
-                                    </td>
-                                    <td>
-                                        @Html.ActionLink(item.Recipes == null ? "None" : item.Recipes.Count.ToString(), "Index", "Recipes", new { id = item.DietId }, null)
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary" onclick="location.href = '@Url.Action("Edit", new {id=item.DietId, id1=ViewBag.PlanId})'">
-                                            Edit
-                                        </button>
-                                        <button class="btn btn-sm btn-inverse" onclick="location.href = '@Url.Action("Details", new { id = item.DietId, id1 = ViewBag.PlanId })'">
-                                            Details
-                                        </button>
-                                        <button class="btn btn-sm btn-warning" onclick="location.href = '@Url.Action("Delete", new { id = item.DietId, id1 = ViewBag.PlanId })'">
-                                            Delete
-                                        </button>
-                                    </td>
-
-                                </tr>
-                                x += 1;
-                            }
+                           
                         </tbody>
                     </table>
                     <blockquote>
-                        <button class="btn btn-default btn-sm" onclick="location.href='@Url.Action("Create",new { id = ViewBag.PlanId })'">
+                        <button id="AddNew" class="btn btn-default btn-sm" onclick="#">
                             Add New
                         </button>
                     </blockquote>
@@ -89,11 +56,19 @@
     </div>
 </div>
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
+    
     @Scripts.Render("~/bundles/dashboard/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+@Scripts.Render("~/Content/js/CrudOps/Diets.js")
+
+<script>
+    $(document).ready(function () {
+        initListAuth();
+    });
+
+</script>
 }
 
 

@@ -14,6 +14,14 @@ namespace JDT
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                name: "FourIds",
+                url: "{controller}/{action}/{id}/{id1}/{id2}/{id3}");
+
+            routes.MapRoute(
+                name: "ThreeIds",
+                url: "{controller}/{action}/{id}/{id1}/{id2}");
+
+            routes.MapRoute(
                 name: "TwoIds",
                 url: "{controller}/{action}/{id}/{id1}");
 

@@ -11,47 +11,47 @@
     <legend>JdtTask</legend>
 
     <div class="display-label">Name</div>
-    <div class="display-field">@Model.Name</div>
+    <div class="display-field" id="Name"></div>
 
     <div class="display-label">Description</div>
-    <div class="display-field">@Model.Description</div>
+    <div class="display-field" id="Description"></div>
 
     <div class="display-label">DateCreated</div>
-    <div class="display-field">@String.Format("{0:g}", Model.DateCreated)</div>
+    <div class="display-field" id="DateCreated"></div>
 
     <div class="display-label">DateModified</div>
-    <div class="display-field">@String.Format("{0:g}", Model.DateModified)</div>
+    <div class="display-field" id="DateModified"></div>
 
-    <div class="display-label">MinSets</div>
-    <div class="display-field">@Model.RecMinSets</div>
+    <div class="display-label">Min - Max Sets</div>
+    <div class="display-field" id="MinMaxSets"></div>
 
-    <div class="display-label">MaxSets</div>
-    <div class="display-field">@Model.RecMaxSets</div>
-
-    <div class="display-label">MinReps</div>
-    <div class="display-field">@Model.RecMinReps</div>
-
-    <div class="display-label">MaxReps</div>
-    <div class="display-field">@Model.RecMaxReps</div>
+    <div class="display-label">Min - Max Reps</div>
+    <div class="display-field" id="MinMaxReps"></div>
 
     <div class="display-label">Duration</div>
-    <div class="display-field">@Model.RecDuration</div>
+    <div class="display-field" id="Duration"></div>
 
-    <div class="display-label">WorkOuts</div>
-    <div class="display-field">@(Model.WorkOuts == null ? "None" : Model.WorkOuts.Count.ToString())</div>
 </fieldset>
-@using (Html.BeginForm("Delete", "JdtTasks", new { id1 = ViewBag.WorkOutId }, FormMethod.Post, new { @class = "form-horizontal" }))
+@using (Html.BeginForm("Delete", "JdtTasks", FormMethod.Post, new { id="Delete", @class = "form-horizontal" }))
 {
     <p>
         <input type="submit" value="Delete" /> |
-        @Html.ActionLink("Back to List", "Index", new { id = ViewBag.WorkOutId })
+        <a href="#" id="List">Back to List</a>
     </p>
 }
 @section scripts{
-    @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/dashboard/jqueryplugins")
     @Scripts.Render("~/bundles/backboneunderscore")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/site")
+
+@Scripts.Render("~/Content/js/CrudOps/Exercises.js")
+
+<script>
+    $(document).ready(function () {
+        initDetailsAuth();
+    });
+
+</script>
 }
 
