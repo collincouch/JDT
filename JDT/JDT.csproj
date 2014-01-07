@@ -182,6 +182,19 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="Content\css\dataTables.bootstrap.css" />
+    <Content Include="Content\css\dataTables.editor.css" />
+    <Content Include="Content\css\TableTools.css" />
+    <Content Include="Content\js\libs\dataTables.bootstrap.js" />
+    <Content Include="Content\js\libs\dataTables.editor.bootstrap.js" />
+    <Content Include="Content\js\libs\dataTables.editor.js" />
+    <Content Include="Content\js\libs\dataTables.editor.min.js" />
+    <Content Include="Content\js\libs\jquery.dataTables-1.9.4.js" />
+    <Content Include="Content\js\libs\jquery.dataTables-1.9.4.min.js" />
+    <Content Include="Content\js\libs\jquery.dataTables.js" />
+    <Content Include="Content\js\libs\TableTools.js" />
+    <Content Include="Content\js\libs\TableTools.min.js" />
+    <Content Include="Content\objects.txt" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DietsController.cs" />
@@ -478,7 +491,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\js\JDT.coffee" />
-    <Content Include="Content\js\libs\.DS_Store" />
     <Content Include="Content\js\libs\examples\pageable-territories.json" />
     <Content Include="Content\js\emails.json" />
     <Content Include="Content\js\folders.json" />
@@ -600,6 +612,7 @@
     <Content Include="Views\InvitedUsers\Details.cshtml" />
     <Content Include="Views\InvitedUsers\Index.cshtml" />
     <Content Include="Views\InvitedUsers\_CreateOrEdit.cshtml" />
+    <Content Include="Views\WorkOuts\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

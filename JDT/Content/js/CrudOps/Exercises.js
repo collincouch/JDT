@@ -11,52 +11,169 @@ function initListAuth() {
     })
 }
 
-function initCreateAuth() {
-    initializeAuth(function (email) {
-        setHeader(email);
-        setSideNav(email);
-        
-    })
+function countProperties(obj) {
+    var prop;
+    var propCount = 0;
+
+    for (prop in obj) {
+        propCount++;
+    }
+    return propCount;
+}
+
+function getTodaysDate() {
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+    var output = d.getFullYear() + '/' +
+        (month < 10 ? '0' : '') + month + '/' +
+        (day < 10 ? '0' : '') + day;
+
+    return output;
 }
     
-    function initEditAuth() {
-        initializeAuth(function (email) {
-            if (email) {
-                getUserIdByEmail(email, function (uid) {
-                    pathname = window.location.pathname.split("/");
-                    planName = pathname[pathname.length - 1];
-                    workOutName = pathname[pathname.length - 2];
-                    exerciseName = pathname[pathname.length - 3];
-                    //console.log(uid);
-                    var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/' + exerciseName);
-                    dataRef.on('value', function (snapshot) {
-                        if (snapshot.val() === null) {
-                            alert('exercise ' + exerciseName + ' does not exist.');
-                        } else {
-                            $('#Name').val(snapshot.val().Name);
-                            $('#elastic-textarea').val(snapshot.val().Description);
-                            $('#minsets').val(snapshot.val().MinSets);
-                            $('#maxsets').val(snapshot.val().MaxSets);
-                            $('#minreps').val(snapshot.val().MinReps);
-                            $('#maxreps').val(snapshot.val().MaxReps);
-                            $('#RecDuration').val(snapshot.val().Duration);
 
+function populateList(email) {
+    var data = [];
+    var columns = [
+    { mData: "Name", sTitle: "Name" },
+    { mData: "Description", sTitle: "Description" },
+    { mData: "DateCreated", sTitle: "Date Created" },
+    { mData: "RecMaxSets", sTitle: "Set Range" },
+    { mData: "RecMinSets", sTitle: "Rep Range" },
+    { mData: "RecMinReps", sTitle: "Rep Range" },
+    { mData: "RecMaxReps", sTitle: "Rep Range" },
+    { mData: "Duration", sTitle: "Duration" }
+    ];
 
-                        }
+    editor = new $.fn.dataTable.Editor({
+        "domTable": "#datatable-table",
+        "fields": [{
+            "label": "Name:",
+            "name": "Name",
+            "attr": { "class": "form-control parsley-validated required", "placeholder": "Name your exercises", "required": "required", "parsley-required": "true" },
+        }, {
+            "label": "Description:",
+            "name": "Description",
+            "type":"textarea",
+        }, {
+            "label": "Date Created:",
+            "name": "DateCreated",
+            "type": "hidden",
+            "default": getTodaysDate()
+        },
+        {
+            "label": "Min Sets:",
+            "name": "RecMinSets",
+            "attr": { "class": "form-control parsley-validated required", "id":"minsets", "data-trigger":"change","data-validation-minlength":"1","required":"required","data-range":"[1,100]"},
+        },
+        {
+            "label": "Max Sets:",
+            "name": "RecMaxSets",
+            "attr": { "class": "form-control parsley-validated required", "id": "maxsets", "data-trigger": "change", "data-validation-minlength": "1", "required": "required", "data-range": "[1,100]" },
+        },
+         {
+             "label": "Min Reps:",
+             "name": "RecMinReps",
+             "attr": { "class": "form-control parsley-validated required", "id": "minreps", "data-trigger": "change", "data-validation-minlength": "1", "required": "required", "data-range": "[1,100]" },
+         },
+        {
+            "label": "Max Reps:",
+            "name": "RecMaxReps",
+            "attr": { "class": "form-control parsley-validated required", "id": "maxreps", "data-trigger": "change", "data-validation-minlength": "1", "required": "required", "data-range": "[1,100]" },
+        },
+         {
+             "label": "Duration:",
+             "name": "RecDuration",
+            
+         },
+        
+        ],
+        "ajax": function (method, url, data, successCallback, errorCallback) {
 
-                    });
-
-
+            var id = null;
+            var obj = {};
+            if (data.action === 'create') {
+                initializeAuth(function (email) {
+                    if (email) {
+                        getUserIdByEmail(email, function (uid) {
+                            pathname = window.location.pathname.split("/");
+                            planName = pathname[pathname.length - 1];
+                            workOutName = pathname[pathname.length - 2];
+                            obj.Name = data.data.Name;
+                            obj.Description = data.data.Description;
+                            obj.RecMinSets = data.data.RecMinSets;
+                            obj.RecMaxSets = data.data.RecMaxSets;
+                            obj.RecMinReps = data.data.RecMinReps;
+                            obj.RecMaxReps = data.data.RecMaxReps;
+                            obj.RecDuration = data.data.RecDuration;
+                            
+                           
+                            var keyName = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/').push(
+                                 obj).name();
+                            id = keyName;
+                            successCallback({ "id": id });
+                        });
+                    }
                 });
 
-                setHeader(email);
-                setSideNav(email);
             }
+            else if (data.action === 'edit') {
+                id = data.id;
+                //console.log('edit id' + data.id);
+                initializeAuth(function (email) {
+                    getUserIdByEmail(email, function (uid) {
+                        pathname = window.location.pathname.split("/");
+                        planName = pathname[pathname.length - 1];
+                        workOutName = pathname[pathname.length - 2];
+                        var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + workOutName + 'Exercises/' + data.id);
+                        obj.Name = data.data.Name;
+                        obj.Description = data.data.Description;
+                        obj.RecMinSets = data.data.RecMinSets;
+                        obj.RecMaxSets = data.data.RecMaxSets;
+                        obj.RecMinReps = data.data.RecMinReps;
+                        obj.RecMaxReps = data.data.RecMaxReps;
+                        obj.RecDuration = data.data.RecDuration;
+                        try {
+                            fb.update(obj);
+                        } catch (e) {
+                            console.log(JSON.stringify(e));
+                        }
+                    });
+                });
+                successCallback({ "id": id });
+            }
+            else if (data.action === 'remove') {
 
-        });
-    }
+                initializeAuth(function (email) {
+                    getUserIdByEmail(email, function (uid) {
+                        pathname = window.location.pathname.split("/");
+                        planName = pathname[pathname.length - 1];
+                        workOutName = pathname[pathname.length - 2];
+                        var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + workOutName + '/Exercises/' +  data.data[0]);
 
-    function populateList(email) {
+                        fb.remove();
+                    })
+                })
+                successCallback({ "id": id });
+            }
+            
+        }
+    });
+
+    editor.on('onOpen', function () {
+
+        $("div.DTE_Body_Content form").attr("parsley-validate", "");
+        $("div.DTE_Body_Content form").attr("novalidate", "novalidate");
+        $("div.DTE_Body_Content form").parsley();
+    });
+
+    editor.on('onPreSubmit', function () {
+        var f = $('form');
+        var valid = f.parsley('validate');
+        if (valid == false)
+            return false;
+    });
         getUserIdByEmail(email, function (uid) {
             pathname = window.location.pathname.split("/");
             planName = pathname[pathname.length - 1];
@@ -71,24 +188,25 @@ function initCreateAuth() {
                     var count = 1;
                     $('tbody').empty();
                     snapshot.forEach(function (childSnapshot) {
-                        var exercise = childSnapshot.val();
-                        tr = $('<tr/>');
-                        tr.append("<td class='hidden-xs-portrait'>" + count + "</td>");
-                        tr.append("<td>" + exercise.Name + "</td>");
-                        tr.append("<td class='hidden-xs'>" + exercise.Description + "</td>");
-                        tr.append("<td class='hidden-xs'>" + exercise.DateCreated + "</td>");
-                        tr.append("<td>" + exercise.MinSets + " - " + exercise.MaxSets + "</td>");
-                        tr.append("<td>" + exercise.MinReps + " - " + exercise.MaxReps + "</td>");
-                        tr.append("<td>" + exercise.Duration + " - " + exercise.Duration + "</td>");
-                        tr.append("<td>"
-                            + "<button class='btn btn-sm btn-primary' onclick=\"location.href='/Exercises/Edit/" + childSnapshot.name() + "/" + workOutName + "/" + planName + "'\">Edit</button>"
-                            + "<button class='btn btn-sm btn-inverse' onclick=\"location.href='/Exercises/Details/" + childSnapshot.name() + "/" + workOutName + "/" + planName + "'\">Details</button>"
-                            + "<button class='btn btn-sm btn-warning' onclick=\"location.href='/Exercises/Delete/" + childSnapshot.name() + "/" + workOutName + "/" + planName + "'\">Delete</button>"
-                            + "</td>");
-                        $('tbody').append(tr);
-                        count++;
+                        var o = $.extend({}, childSnapshot.val()); // does childSnapshot.val() need to be $.parseJSON()'ed? It if it s JSON string it will.
+                        o.DT_RowId = childSnapshot.name();
+                        data.push(o);
                     });
                 }
+                $('#datatable-table').dataTable({
+                    "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                    "aaData": data,
+                    "aoColumns": columns,
+                    "oTableTools": {
+                        "sRowSelect": "single",
+                        "aButtons": [
+                            { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
+                            { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
+                            { "sExtends": "editor_remove", "editor": editor }
+                        ]
+                    },
+                    bRetrieve: true,
+                });
 
             });
 
@@ -96,20 +214,6 @@ function initCreateAuth() {
         });
     }
 
-    $(document).on("click", "#AddNew", function () {
-        //console.log('asdfsdf')
-        window.location.replace("/Exercises/Create/" + workOutName + "/" + planName);
-    });
-
-    $(document).on("click", "#EditDetails", function () {
-        //console.log('asdfsdf')
-        window.location.replace("/Exercises/Edit/" + exerciseName + "/" + workOutName + '/' + planName);
-    });
-
-    $(document).on("click", "#List", function () {
-        //console.log('asdfsdf')
-        window.location.replace("/Exercises/Index/" + workOutName + '/' + planName);
-    });
     $("#Edit").submit(function (event) {
         event.preventDefault();
         initializeAuth(function (email) {

@@ -17,13 +17,15 @@ namespace JDT.Controllers
 
         //
         // GET: /JdtTasks/
-        [MvcSiteMapNode(Title = "Exercise", ParentKey = "WorkOut", PreservedRouteParameters = "id")]
+        [MvcSiteMapNode(Title = "Exercises", ParentKey = "WorkOut", PreservedRouteParameters = "id")]
         public ViewResult Index(string id)
         {
            
             return View();
 
         }
+
+        
 
         //
         // GET: /JdtTasks/Details/5

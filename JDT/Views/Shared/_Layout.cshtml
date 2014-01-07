@@ -10,9 +10,17 @@
         <meta charset="utf-8">
         <script src="https://cdn.firebase.com/v0/firebase.js"></script>
         <script src="https://cdn.firebase.com/v0/firebase-simple-login.js"></script>
+        <style type="text/css">
+            @@import "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css";
+            div.modal-content > form {
+                data-validate:"parsley";
+            }
+            </style>
         @Styles.Render("~/Content/css/bundles")
+        @Styles.Render("~/Content/css/datatables/bundles")
         @Scripts.Render("~/bundles/jquery")
         @Scripts.Render("~/bundles/fireBase")
+
         <script>
             var auth1;
             var jdtRef1 = new Firebase('https://jdt.firebaseio.com');
@@ -22,9 +30,9 @@
                     //console.log("signing out");
                     //window.location.replace("../Account/Login");
                 });
-            
 
-            
+
+
             });
 
             function initializeAuth(callback) {
@@ -72,8 +80,8 @@
 
         </div>
     </nav>
-    
-            
+
+
             <div class="wrap">
                 <header class="page-header">
                     <div class="navbar">
@@ -82,14 +90,15 @@
                         </ul>
 
 
-                        
+
                     </div>
                     @Html.MvcSiteMap().SiteMapPath()
                 </header>
                 @RenderBody()
             </div>
+    <script type="text/javascript" charset="utf-8" src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
             @RenderSection("scripts", required: false)
-
+            
             <script type="text/template" id="settings-template">
                 <div class="setting clearfix">
                     <div>Background</div>

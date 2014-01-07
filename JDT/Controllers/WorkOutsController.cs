@@ -23,20 +23,18 @@ namespace JDT.Controllers
         //
         // GET: /WorkOuts/
 
-        [MvcSiteMapNode(Title = "Diet", ParentKey = "Plan", PreservedRouteParameters = "id")]
+        [MvcSiteMapNode(Title = "Workouts", ParentKey = "Plan", PreservedRouteParameters = "id")]
         public ViewResult Index(string id)
         {
-            //int uid = WebSecurity.CurrentUserId;
-            //ViewBag.PlanId = Convert.ToString(id);
-
-            //List<WorkOut> workOuts = context.Plans.SingleOrDefault(p => p.PlanId == id && p.CreatorId == uid) == null ?
-            //    new List<WorkOut>() { } : context.Plans.SingleOrDefault(p => p.PlanId == id && p.CreatorId == uid).
-            //    WorkOuts.ToList();
-
-            //return View(workOuts);
 
             return View();
 
+        }
+
+
+        public ViewResult Search(string id)
+        {
+            return View();
         }
 
         //

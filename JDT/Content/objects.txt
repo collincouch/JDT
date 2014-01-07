@@ -1,0 +1,30 @@
+﻿[
+  {
+    "xxx" : [
+      {
+        "mData" : "xxx.DateCreated",
+        "aTargets" : [
+          0
+        ]
+      },
+      {
+        "mData" : "xxx.DateModified",
+        "aTargets" : [
+          1
+        ]
+      },
+      {
+        "mData" : "xxx.Description",
+        "aTargets" : [
+          2
+        ]
+      },
+      {
+        "mData" : "xxx.Name",
+        "aTargets" : [
+          3
+        ]
+      }
+    ]
+  }
+]

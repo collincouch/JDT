@@ -1,5 +1,9 @@
 ﻿var pathname;
 var planName;
+var editor;
+var oTable;
+
+
 
 function initListAuth() {
     initializeAuth(function (email) {
@@ -9,168 +13,219 @@ function initListAuth() {
     })
 }
 
-function initCreateAuth() {
-    initializeAuth(function (email) {
-        setHeader(email);
-        setSideNav(email);
-        
-    })
+function countProperties(obj) {
+    var prop;
+    var propCount = 0;
+
+    for (prop in obj) {
+        propCount++;
+    }
+    return propCount;
 }
-    
-    function initEditAuth() {
-        initializeAuth(function (email) {
-            if (email) {
-                getUserIdByEmail(email, function (uid) {
-                    pathname = window.location.pathname.split("/");
-                    planName = pathname[pathname.length - 1];
-                    //console.log(uid);
-                    var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName);
-                    dataRef.on('value', function (snapshot) {
-                        if (snapshot.val() === null) {
-                            alert('plan ' + planName + ' does not exist.');
-                        } else {
-                            $('#Name').val(snapshot.val().Name);
-                            $('#elastic-textarea').val(snapshot.val().Description);
 
+function getTodaysDate() {
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+    var output = d.getFullYear() + '/' +
+        (month < 10 ? '0' : '') + month + '/' +
+        (day < 10 ? '0' : '') + day;
+
+    return output;
+}
+
+
+function populateList(email) {
+    var id = null;
+    var url;
+
+    var obj = {};
+    var x;
+        var data= [];
+        var columns = [
+		{ mData: "Name", sTitle: "Name" },
+        { mData: "Description", sTitle: "Description" },
+        { mData: "DateCreated", sTitle: "Date Created" },
+        {
+            sDefaultContent: "0",
+            mRender: function (data, type, row) {
+                if(type=="display"){
+                //console.log(JSON.stringify(row));
+                var returnVal = row.WorkOuts == null ? "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">0</a>" : "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">" + countProperties(row.WorkOuts) + "</a>";
+                return returnVal;
+                }
+            },
+            "aTargets": [3]
+        }
+        ];
+
+        //$("form").attr("data_validate", "parsley");
+
+        
+        editor = new $.fn.dataTable.Editor({
+            "domTable": "#datatable-table",
+            "fields": [{
+                "label": "Name:",
+                "name": "Name",
+                "attr":  { "class":"form-control parsley-validated required","placeholder":"Name your plan","required":"required", "parsley-required":"true"},
+            }, {
+                "label": "Description:",
+                "name": "Description",
+                "type": "textarea",
+            }, {
+                "label": "DateCreated:",
+                "name": "DateCreated",
+                "type": "hidden",
+                "default": getTodaysDate()
+            }
+            ],
+            
+            "ajax": function (method, url, data, successCallback, errorCallback) {
+
+               
+                if (data.action === 'create') {
+                    initializeAuth(function (email) {
+                        if (email) {
+                            getUserIdByEmail(email, function (uid) {
+
+                                //
+                                //oTable.fnClearTable();
+                                //oTable.fnDraw();
+                    var name = data.data.Name;
+                    var description = data.data.Description;
+                    
+              
+                    obj.Name = name;
+                    obj.Description = description;
+                    obj.DateCreated = getTodaysDate();
+                    obj.DateModified = getTodaysDate();
+                    url = 'https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/'
+                    var f = new Firebase(url);
+                    id = f.push(obj).name();
+                    x = obj;
+                    
+                    console.log('id ' + id);
+                    successCallback({ "id": 'xxx' });
+                    //oTable.fnDestroy();
+                            });
                         }
-
+                    });
+        
+                }
+                else if (data.action === 'edit') {
+                    id = data.id;
+                    console.log('edit id' + data.id);
+                    initializeAuth(function (email) {
+                        getUserIdByEmail(email, function (uid) {
+                            var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + data.id);
+                            var name = data.data.Name;
+                            //console.log('data ' + JSON.stringify(data) + ' DateCreated ' + output + ' uid ' + uid);
+                            var description = data.data.Description;
+                            try {
+                                fb.update({
+                                    "Name": name,
+                                    "Description": description,
+                                    "DateModified": getTodaysDate()
+                                });
+                                
+                            } catch (e) {
+                                console.log(JSON.stringify(e));
+                            }
+                        });
                     });
 
+                    successCallback({ "id": id });
 
-                });
+                }
+                else if (data.action === 'remove') {
+                    
+                    initializeAuth(function (email) {
+                        getUserIdByEmail(email, function (uid) {
+                            console.log('remove ' + JSON.stringify(data));
+                    var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + data.data[0]);
 
-                setHeader(email);
-                setSideNav(email);
-            }
+                    //console.log('id ' + data.data[0]);
+                    fb.remove();
+                    console.log('id ' + data.data[0]);
+                    
 
+                        })
+                    })
+                    successCallback({ "id": null });
+                }
+               
+               
+            },
+           
         });
-    }
 
-    function populateList(email) {
+       
+        
+            editor.on('onOpen', function () {
+                //console.log('parsley ' + JSON.stringify(data));
+                $("div.DTE_Body_Content form").attr("parsley-validate", "");
+                $("div.DTE_Body_Content form").attr("novalidate", "novalidate");
+                $("div.DTE_Body_Content form").parsley();
+            });
+
+            editor.on('onPreSubmit', function () {
+                var f = $('form');
+                if (f.css('display') != 'none') {
+                    var valid = f.parsley('validate');
+                    if (valid == false)
+                        return false;
+                }
+            });
+        
+            editor.on('onCreate', function (json,data) {
+
+                var nRow = $('#xxx')[0];
+
+                oTable.fnDeleteRow(nRow);
+            });
+           
+        
+       
+
         getUserIdByEmail(email, function (uid) {
             var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/');
             dataRef.on('value', function (snapshot) {
-                if (snapshot.val() === null) {
-                    console.log('Plans for user ' + uid + ' do not exist.');
-                } else {
-                    var tr;
-                    var count = 1;
-                    $('tbody').empty();
-                    snapshot.forEach(function (childSnapshot) {
-                        var plan = childSnapshot.val();
-                        tr = $('<tr/>');
-                        tr.append("<td class='hidden-xs-portrait'>" + count + "</td>");
-                        tr.append("<td>" + plan.Name + "</td>");
-                        tr.append("<td class='hidden-xs'>" + plan.Description + "</td>");
-                        tr.append("<td class='hidden-xs'>" + plan.DateCreated + "</td>");
-                        tr.append("<td><a href=\"/WorkOuts/Index/" + childSnapshot.name() + "\">" + childSnapshot.child('WorkOuts').numChildren() + "</a></td>");
-                        tr.append("<td><a href=\"/Diets/Index/" + childSnapshot.name() + "\">" + childSnapshot.child('Diets').numChildren() + "</a></td>");
-                        tr.append("<td>"
-                            + "<button class='btn btn-sm btn-primary' onclick=\"location.href='/Plans/Edit/" + childSnapshot.name() + "'\">Edit</button>"
-                            + "<button class='btn btn-sm btn-inverse' onclick=\"location.href='/Plans/Details/" + childSnapshot.name() + "'\">Details</button>"
-                            + "<button class='btn btn-sm btn-warning' onclick=\"location.href='/Plans/Delete/" + childSnapshot.name() + "'\">Delete</button>"
-                            + "</td>");
-                        $('tbody').append(tr);
-                        count++;
+               
+                data = [];
+                snapshot.forEach(function (childSnapshot) {
+                    var o = $.extend({}, childSnapshot.val()); 
+                    o.DT_RowId = childSnapshot.name();
+                    data.push(o);
+
+                });
+              
+                    oTable = $('#datatable-table').dataTable({
+                        "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                        "aaData": data,
+                        "aoColumns": columns,
+                        "oTableTools": {
+                            "sRowSelect": "single",
+                            "aButtons": [
+                                { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_remove", "editor": editor }
+                            ]
+                        },
+                        "bDestroy": true,
+                       
                     });
-                }
-
+                    
+    
             });
-
-
+           
         });
+
+
+       
+
     }
 
-    $(document).on("click", "#AddNew", function () {
-        //console.log('asdfsdf')
-        window.location.replace("../Create/" + planName);
-    });
 
-    $(document).on("click", "#EditDetails", function () {
-        //console.log('asdfsdf')
-        window.location.replace("../Edit/" + planName);
-    });
-
-    $(document).on("click", "#List", function () {
-        //console.log('asdfsdf')
-        window.location.replace("../Index/");
-    });
-    $("#Edit").submit(function (event) {
-        event.preventDefault();
-        initializeAuth(function (email) {
-            getUserIdByEmail(email, function (uid) {
-                var d = new Date();
-                var month = d.getMonth() + 1;
-                var day = d.getDate();
-                var output = d.getFullYear() + '/' +
-                    (month < 10 ? '0' : '') + month + '/' +
-                    (day < 10 ? '0' : '') + day;
-
-              
-                var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName);
-                var name = $("#Name").val();
-                var description = $("#elastic-textarea").val();
-                fb.update({
-                    "Name": name,
-                    "Description": description,
-                    "DateModified": output
-                });
-
-                window.location.replace('/Plans/Index/' + planName);
-            });
-        });
-    });
-    $("#Create").submit(function (event) {
-        event.preventDefault();
-        initializeAuth(function (email) {
-            if (email) {
-                getUserIdByEmail(email, function (uid) {
-                    pathname = window.location.pathname.split("/");
-                    planName = pathname[pathname.length - 1];
-                    var d = new Date();
-                    var month = d.getMonth() + 1;
-                    var day = d.getDate();
-                    var output = d.getFullYear() + '/' +
-                        (month < 10 ? '0' : '') + month + '/' +
-                        (day < 10 ? '0' : '') + day;
-
-                    var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/');
-                    var name = $("#Name").val();
-                    var description = $("#elastic-textarea").val();
-                    fb.push({
-                        "Name": name,
-                        "Description": description,
-                        "DateCreated": output,
-                        "DateModified": output
-                    });
-
-                    window.location.replace('/Plans/Index/' + planName);
-                });
-            }
-
-        });
-    });
-    $("#Delete").submit(function (event) {
-        event.preventDefault();
-        initializeAuth(function (email) {
-            getUserIdByEmail(email, function (uid) {
-                var d = new Date();
-                var month = d.getMonth() + 1;
-                var day = d.getDate();
-                var output = d.getFullYear() + '/' +
-                    (month < 10 ? '0' : '') + month + '/' +
-                    (day < 10 ? '0' : '') + day;
-
-                var pathname = window.location.pathname.split("/");
-                var planName = pathname[pathname.length - 1];
-                var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName);
-
-                fb.remove();
-
-                window.location.replace('/Plans/Index/');
-            });
-        });
-    });
 
     function initDetailsAuth() {
         initializeAuth(function (email) {
@@ -186,11 +241,11 @@ function initCreateAuth() {
                         if (snapshot.val() === null) {
                             alert('plan ' + planName + ' does not exist.');
                         } else {
-                            $('#Name').text(snapshot.val().Name);
-                            $('#Description').text(snapshot.val().Description);
-                            $('#DateCreated').text(snapshot.val().DateCreated);
-                            $('#DateModified').text(snapshot.val().DateModified);
-                            $('#Exercises').val(dataRef.parent().child('Exercises').numChildren());
+                           // $('#Name').text(snapshot.val().Name);
+                           // $('#Description').text(snapshot.val().Description);
+                           // $('#DateCreated').text(snapshot.val().DateCreated);
+                           // $('#DateModified').text(snapshot.val().DateModified);
+                           // $('#Exercises').val(dataRef.parent().child('Exercises').numChildren());
 
 
                         }
@@ -203,4 +258,8 @@ function initCreateAuth() {
 
         });
     }
+
+   
+
+       
 

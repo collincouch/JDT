@@ -25,7 +25,12 @@ namespace JDT
                        "~/Content/js/libs/jquery-maskedinput/jquery.maskedinput.js",
                        "~/Content/js/libs/parsley/parsley.js",
                     "~/Content/js/libs/icheck.js/jquery.icheck.js",
-                    "~/Content/js/libs/select2.js"));
+                    "~/Content/js/libs/select2.js",
+                    "~/Content/js/libs/jquery.dataTables-{version}.js",
+                    "~/Content/js/libs/TableTools.js",
+                    "~/Content/js/libs/dataTables.editor.js",
+                    "~/Content/js/libs/dataTables.bootstrap.js",
+                    "~/Content/js/libs/dataTables.editor.bootstrap.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/dashboard/jqueryplugins").Include(
                        "~/Content/js/libs/icheck.js/jquery.icheck.js",
@@ -56,6 +61,7 @@ namespace JDT
                         "~/Content/js/libs/backbone/backbone.localStorage.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
+                        
                        "~/Content/js/libs/bootstrap/transition.js",
                        "~/Content/js/libs/bootstrap/collapse.js",
                        "~/Content/js/libs/bootstrap/alert.js",
@@ -91,6 +97,11 @@ namespace JDT
 
             bundles.Add(new StyleBundle("~/Content/css/bundles").
                 Include("~/Content/css/application.css"));
+
+            bundles.Add(new StyleBundle("~/Content/css/datatables/bundles").
+                Include(
+                "~/Content/css/TableTools.css",
+                "~/Content/css/dataTables.bootstrap.css"));
 
         }
     }
