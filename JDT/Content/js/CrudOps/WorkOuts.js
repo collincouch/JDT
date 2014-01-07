@@ -48,7 +48,7 @@ function populateList(email) {
             sDefaultContent: "0",
             mRender: function (data, type, row) {
                 //console.log(row);
-                var returnVal = row.Exercises == null ? "<a href=\"/Exercises/Index/" + row.DT_RowId + "/" + planName + "\">0</a>" : "<a href=\"/Exercises/Index/" + row.DT_RowId + "\">" + countProperties(row.Exercises) + "</a>";
+                var returnVal = row.Exercises == null ? "<a href=\"/Exercises/Index/" + row.DT_RowId + "/" + planName + "\">0</a>" : "<a href=\"/Exercises/Index/" + row.DT_RowId + "/" + planName + "\">" + countProperties(row.Exercises) + "</a>";
                 return returnVal;
             },
             "aTargets": [3]

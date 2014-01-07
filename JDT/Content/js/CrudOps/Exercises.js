@@ -2,6 +2,9 @@
 var planName;
 var workOutName;
 var exerciseName;
+var editor;
+var oTable;
+var data = [];
 
 function initListAuth() {
     initializeAuth(function (email) {
@@ -34,7 +37,7 @@ function getTodaysDate() {
     
 
 function populateList(email) {
-    var data = [];
+ 
     var columns = [
     { mData: "Name", sTitle: "Name" },
     { mData: "Description", sTitle: "Description" },
@@ -43,7 +46,7 @@ function populateList(email) {
     { mData: "RecMinSets", sTitle: "Rep Range" },
     { mData: "RecMinReps", sTitle: "Rep Range" },
     { mData: "RecMaxReps", sTitle: "Rep Range" },
-    { mData: "Duration", sTitle: "Duration" }
+    { mData: "RecDuration", sTitle: "Duration" }
     ];
 
     editor = new $.fn.dataTable.Editor({
@@ -93,6 +96,7 @@ function populateList(email) {
 
             var id = null;
             var obj = {};
+            var url;
             if (data.action === 'create') {
                 initializeAuth(function (email) {
                     if (email) {
@@ -102,17 +106,17 @@ function populateList(email) {
                             workOutName = pathname[pathname.length - 2];
                             obj.Name = data.data.Name;
                             obj.Description = data.data.Description;
+                            obj.DateCreated = getTodaysDate();
+                            obj.DateModified = getTodaysDate();
                             obj.RecMinSets = data.data.RecMinSets;
                             obj.RecMaxSets = data.data.RecMaxSets;
                             obj.RecMinReps = data.data.RecMinReps;
                             obj.RecMaxReps = data.data.RecMaxReps;
                             obj.RecDuration = data.data.RecDuration;
-                            
-                           
-                            var keyName = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/').push(
-                                 obj).name();
-                            id = keyName;
-                            successCallback({ "id": id });
+                            url = 'https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/';
+                            var f = new Firebase(url);
+                            id = f.push(obj).name();
+                            successCallback({ "id": 'xxx' });
                         });
                     }
                 });
@@ -129,6 +133,7 @@ function populateList(email) {
                         var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + workOutName + 'Exercises/' + data.id);
                         obj.Name = data.data.Name;
                         obj.Description = data.data.Description;
+                        obj.DateModified = getTodaysDate();
                         obj.RecMinSets = data.data.RecMinSets;
                         obj.RecMaxSets = data.data.RecMaxSets;
                         obj.RecMinReps = data.data.RecMinReps;
@@ -170,9 +175,19 @@ function populateList(email) {
 
     editor.on('onPreSubmit', function () {
         var f = $('form');
-        var valid = f.parsley('validate');
-        if (valid == false)
-            return false;
+        if (f.css('display') != 'none') {
+            var valid = f.parsley('validate');
+            console.log('valid ' + valid);
+            if (valid == false)
+                return false;
+        }
+    });
+
+    editor.on('onCreate', function (json, data) {
+
+        var nRow = $('#xxx')[0];
+
+        oTable.fnDeleteRow(nRow);
     });
         getUserIdByEmail(email, function (uid) {
             pathname = window.location.pathname.split("/");
@@ -180,6 +195,7 @@ function populateList(email) {
             workOutName = pathname[pathname.length - 2];
             var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/');
             dataRef.on('value', function (snapshot) {
+                data = [];
                 if (snapshot.val() === null) {
                     console.log('Exercises for workout ' + workOutName + ' do not exist.');
                 } else {
@@ -193,7 +209,7 @@ function populateList(email) {
                         data.push(o);
                     });
                 }
-                $('#datatable-table').dataTable({
+               oTable = $('#datatable-table').dataTable({
                     "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
                     "aaData": data,
                     "aoColumns": columns,
@@ -205,7 +221,7 @@ function populateList(email) {
                             { "sExtends": "editor_remove", "editor": editor }
                         ]
                     },
-                    bRetrieve: true,
+                    bDestroy: true,
                 });
 
             });
@@ -214,108 +230,7 @@ function populateList(email) {
         });
     }
 
-    $("#Edit").submit(function (event) {
-        event.preventDefault();
-        initializeAuth(function (email) {
-            getUserIdByEmail(email, function (uid) {
-                var d = new Date();
-                var month = d.getMonth() + 1;
-                var day = d.getDate();
-                var output = d.getFullYear() + '/' +
-                    (month < 10 ? '0' : '') + month + '/' +
-                    (day < 10 ? '0' : '') + day;
-
-               
-
-                var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/' + exerciseName);
-                var name = $("#Name").val();
-                var description = $("#elastic-textarea").val();
-                var minSets = $("#minsets").val();
-                var maxSets = $("#maxsets").val();
-                var minReps = $("#minreps").val();
-                var maxReps = $("#maxreps").val();
-                var duration = $("#RecDuration").val();
-                fb.update({
-                    "Name": name,
-                    "Description": description,
-                    "DateModified": output,
-                    "MinSets": minSets,
-                    "MaxSets": maxSets,
-                    "MinReps": minReps,
-                    "MaxReps": maxReps,
-                    "Duration": duration
-                });
-
-                window.location.replace('/Exercises/Index/' + workOutName + '/' + planName);
-            });
-        });
-    });
-    $("#Create").submit(function (event) {
-        event.preventDefault();
-        initializeAuth(function (email) {
-            if (email) {
-                getUserIdByEmail(email, function (uid) {
-                    pathname = window.location.pathname.split("/");
-                    planName = pathname[pathname.length - 1];
-                    workOutName = pathname[pathname.length - 2];
-                    var d = new Date();
-                    var month = d.getMonth() + 1;
-                    var day = d.getDate();
-                    var output = d.getFullYear() + '/' +
-                        (month < 10 ? '0' : '') + month + '/' +
-                        (day < 10 ? '0' : '') + day;
-                    //console.log('uid: ' + uid + ' planname ' + planName + ' workout ' + workOutName);
-                    var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/');
-                    var name = $("#Name").val();
-                    var description = $("#elastic-textarea").val();
-                    var minSets = $("#minsets").val();
-                    var maxSets = $("#maxsets").val();
-                    var minReps = $("#minreps").val();
-                    var maxReps = $("#maxreps").val();
-                    var duration = $("#RecDuration").val();
-                    //console.log('name: ' + name + ' des: ' + ' minSets: ' + minSets + ' maxSets: ' + maxSets);
-                    fb.push({
-                        "Name": name,
-                        "Description": description,
-                        "DateCreated": output,
-                        "DateModified": output,
-                        "MinSets": minSets,
-                        "MaxSets": maxSets,
-                        "MinReps": minReps,
-                        "MaxReps": maxReps,
-                        "Duration": duration
-                    });
-                    //console.log('asdfasdf');
-                    window.location.replace('/Exercises/Index/' + workOutName + '/' + planName);
-                });
-            }
-
-        });
-    });
-    $("#Delete").submit(function (event) {
-        event.preventDefault();
-        initializeAuth(function (email) {
-            getUserIdByEmail(email, function (uid) {
-                var d = new Date();
-                var month = d.getMonth() + 1;
-                var day = d.getDate();
-                var output = d.getFullYear() + '/' +
-                    (month < 10 ? '0' : '') + month + '/' +
-                    (day < 10 ? '0' : '') + day;
-
-                var pathname = window.location.pathname.split("/");
-                var planName = pathname[pathname.length - 1];
-                var workOutName = pathname[pathname.length - 2];
-                var exerciseName = pathname[pathname.length - 3];
-                var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/' + exerciseName);
-
-                fb.remove();
-
-                window.location.replace('/Exercises/Index/' + workOutName);
-            });
-        });
-    });
-
+  
     function initDetailsAuth() {
         initializeAuth(function (email) {
             if (email) {
