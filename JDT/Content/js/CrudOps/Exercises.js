@@ -42,10 +42,27 @@ function populateList(email) {
     { mData: "Name", sTitle: "Name" },
     { mData: "Description", sTitle: "Description" },
     { mData: "DateCreated", sTitle: "Date Created" },
-    { mData: "RecMaxSets", sTitle: "Set Range" },
-    { mData: "RecMinSets", sTitle: "Rep Range" },
-    { mData: "RecMinReps", sTitle: "Rep Range" },
-    { mData: "RecMaxReps", sTitle: "Rep Range" },
+     {
+         "aTargets": [3],
+         mData:"RecMaxSets",
+         mRender: function (data, type, row) {
+
+                 var returnVal = row.RecMinSets + ' - ' + row.RecMaxSets;
+                 return returnVal;
+             
+         }
+     },
+     {
+         "aTargets": [4],
+         mData:"RecMaxReps",
+         mRender: function (data, type, row) {
+
+                 var returnVal = row.RecMinReps + ' - ' + row.RecMaxReps;
+                 return returnVal;
+
+         },
+
+     },
     { mData: "RecDuration", sTitle: "Duration" }
     ];
 
