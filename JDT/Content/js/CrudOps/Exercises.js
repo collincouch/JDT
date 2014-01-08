@@ -142,9 +142,17 @@ function populateList(email) {
                             obj.RecMinReps = data.data.RecMinReps;
                             obj.RecMaxReps = data.data.RecMaxReps;
                             obj.RecDuration = data.data.RecDuration;
-                            url = 'https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/';
+                            url = 'https://jdt.firebaseio.com/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/';
+                            var root = new Firebase("https://jdt.firebaseio.com");
                             var f = new Firebase(url);
-                            id = f.push(obj).name();
+                            id = f.push(obj, function (err) {
+                                if (!err) {
+                                    root.child('/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/' + id).set(true);
+                                }
+                                else {
+                                    console.log('error ' + err);
+                                }
+                            }).name();
                             successCallback({ "id": 'xxx' });
                         });
                     }
@@ -157,7 +165,7 @@ function populateList(email) {
                 initializeAuth(function (email) {
                     getUserIdByEmail(email, function (uid) {
 
-                        var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + workOutName + '/Exercises/' + data.id);
+                        var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/' + data.id);
                         obj.Name = data.data.Name;
                         obj.Description = data.data.Description;
                         obj.DateModified = getTodaysDate();
@@ -182,7 +190,7 @@ function populateList(email) {
                 initializeAuth(function (email) {
                     getUserIdByEmail(email, function (uid) {
 
-                        var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + workOutName + '/Exercises/' +  data.data[0]);
+                        var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + planName + "/WorkOuts/" + workOutName + '/Exercises/' +  data.data[0]);
 
                         fb.remove();
                     })
@@ -220,23 +228,48 @@ function populateList(email) {
             pathname = window.location.pathname.split("/");
             planName = pathname[pathname.length - 2];
             workOutName = pathname[pathname.length - 1];
-            var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/');
-            dataRef.on('value', function (snapshot) {
-                data = [];
-                if (snapshot.val() === null) {
-                    console.log('Exercises for workout ' + workOutName + ' do not exist.');
-                } else {
-                    
-                    var tr;
-                    var count = 1;
-                    $('tbody').empty();
-                    snapshot.forEach(function (childSnapshot) {
-                        var o = $.extend({}, childSnapshot.val()); // does childSnapshot.val() need to be $.parseJSON()'ed? It if it s JSON string it will.
-                        o.DT_RowId = childSnapshot.name();
-                        data.push(o);
+            var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
+            var workOutsExercisesRef = new Firebase('https://jdt.firebaseio.com/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/');
+            //console.log('asdfasfd' + planName)
+            var userPlansWorkOutsExercisesRef = userRef.child(uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/');
+            //console.log('fjfjfjfj');
+            //data = [];
+            userPlansWorkOutsExercisesRef.on('child_added', function (snapshot) {
+                //console.log('child ');
+                //
+                workOutsExercisesRef.child(snapshot.name()).once("value", function (childSnapshot) {
+
+                    var o = childSnapshot.val();
+                    o.DT_RowId = childSnapshot.name();
+
+                    data.push(o);
+
+                    oTable = $('#datatable-table').dataTable({
+                        "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                        "aaData": data,
+                        "aoColumns": columns,
+                        "oTableTools": {
+                            "sRowSelect": "single",
+                            "aButtons": [
+                                { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
+                            ]
+                        },
+                        bDestroy: true,
+
                     });
-                }
-               oTable = $('#datatable-table').dataTable({
+
+                });
+
+
+
+
+
+            });
+
+            if (typeof oTable != undefined) {
+                oTable = $('#datatable-table').dataTable({
                     "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
                     "aaData": data,
                     "aoColumns": columns,
@@ -249,12 +282,11 @@ function populateList(email) {
                         ]
                     },
                     bDestroy: true,
+
                 });
-
-            });
-
-
+            }
         });
+
     }
 
   

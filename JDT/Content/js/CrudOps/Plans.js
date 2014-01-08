@@ -38,6 +38,7 @@ function getTodaysDate() {
 function populateList(email) {
     var id = null;
     var url;
+    var url1;
 
     var obj = {};
     var x;
@@ -50,7 +51,7 @@ function populateList(email) {
             sDefaultContent: "0",
             mRender: function (data, type, row) {
                 if(type=="display"){
-                //console.log(JSON.stringify(row));
+                console.log(JSON.stringify(row));
                 var returnVal = row.WorkOuts == null ? "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">0</a>" : "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">" + countProperties(row.WorkOuts) + "</a>";
                 return returnVal;
                 }
@@ -99,10 +100,6 @@ function populateList(email) {
                     initializeAuth(function (email) {
                         if (email) {
                             getUserIdByEmail(email, function (uid) {
-
-                                //
-                                //oTable.fnClearTable();
-                                //oTable.fnDraw();
                     var name = data.data.Name;
                     var description = data.data.Description;
                     
@@ -111,14 +108,17 @@ function populateList(email) {
                     obj.Description = description;
                     obj.DateCreated = getTodaysDate();
                     obj.DateModified = getTodaysDate();
-                    url = 'https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/'
-                    var f = new Firebase(url);
-                    id = f.push(obj).name();
-                    x = obj;
-                    
-                    console.log('id ' + id);
+                    url1 = 'https://jdt.firebaseio.com/Plans/';
+                    var root = new Firebase("https://jdt.firebaseio.com");
+                    var f = new Firebase(url1);
+                    id = f.push(obj, function (err) {
+                        if (!err) {
+                            root.child('/Users/user/' + uid + '/Plans/' + id).set(true);
+                        }
+                    }).name();
+
                     successCallback({ "id": 'xxx' });
-                    //oTable.fnDestroy();
+                    
                             });
                         }
                     });
@@ -129,7 +129,7 @@ function populateList(email) {
                     console.log('edit id' + data.id);
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
-                            var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + data.id);
+                            var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + data.id);
                             var name = data.data.Name;
                             //console.log('data ' + JSON.stringify(data) + ' DateCreated ' + output + ' uid ' + uid);
                             var description = data.data.Description;
@@ -154,7 +154,7 @@ function populateList(email) {
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
                             console.log('remove ' + JSON.stringify(data));
-                    var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + data.data[0]);
+                    var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + data.data[0]);
 
                     //console.log('id ' + data.data[0]);
                     fb.remove();
@@ -200,37 +200,50 @@ function populateList(email) {
        
 
         getUserIdByEmail(email, function (uid) {
-            var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/');
-            dataRef.on('value', function (snapshot) {
-               
-                data = [];
-                snapshot.forEach(function (childSnapshot) {
-                    var o = $.extend({}, childSnapshot.val()); 
-                    o.DT_RowId = childSnapshot.name();
-                    data.push(o);
+            var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
+            var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
+            var userPlansRef = userRef.child(uid + '/Plans/');
+            
+            userPlansRef.on('child_added', function (snapshot) {
+                //console.log('child ' + snapshot.name());
+                //data = [];
+                plansRef.child(snapshot.name()).once("value", function (childSnapshot) {
 
-                });
+                        var o = childSnapshot.val();
+                        o.DT_RowId = childSnapshot.name();
+
+                        data.push(o);
+
+                        oTable = $('#datatable-table').dataTable({
+                            "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                            "aaData": data,
+                            "aoColumns": columns,
+                            "oTableTools": {
+                                "sRowSelect": "single",
+                                "aButtons": [
+                                    { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                    { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                    { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
+                                ]
+                            },
+                            "bDestroy": true,
+
+
+                        });
+
+                }
+
+
+                    );
+                    
               
-                    oTable = $('#datatable-table').dataTable({
-                        "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
-                        "aaData": data,
-                        "aoColumns": columns,
-                        "oTableTools": {
-                            "sRowSelect": "single",
-                            "aButtons": [
-                                { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
-                                { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
-                                { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
-                            ]
-                        },
-                        "bDestroy": true,
-
-                       
-                    });
+               
                     
     
             });
            
+            console.log('data ' + JSON.stringify(data));
+            
         });
 
 

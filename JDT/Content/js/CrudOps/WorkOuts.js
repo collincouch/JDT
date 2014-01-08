@@ -98,9 +98,17 @@ function populateList(email) {
                                 obj.Description = description;
                                 obj.DateCreated = getTodaysDate();
                                 obj.DateModified = getTodaysDate();
-                                url = 'https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/';
+                                url = 'https://jdt.firebaseio.com/Plans/' + planName + '/WorkOuts/';
+                                var root = new Firebase("https://jdt.firebaseio.com");
                                 var f = new Firebase(url);
-                                id = f.push(obj).name();
+                                id = f.push(obj, function (err) {
+                                    if (!err) {
+                                        root.child('/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' +id).set(true);
+                                    }
+                                    else {
+                                        console.log('error ' + err);
+                                    }
+                                }).name();
                                 successCallback({ "id": 'xxx' });
                             });
                         }
@@ -112,7 +120,7 @@ function populateList(email) {
                     //console.log('edit id' + data.id);
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
-                            var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + data.id);
+                            var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + planName + '/WorkOuts/' + data.id);
                             var name = data.data.Name;
                             //console.log('data ' + JSON.stringify(data) + ' DateCreated ' + output + ' uid ' + uid);
                             var description = data.data.Description;
@@ -134,7 +142,7 @@ function populateList(email) {
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
                             //console.log('workout id ' + data.data[0]);
-                            var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + data.data[0]);
+                            var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + planName + '/WorkOuts/' + data.data[0]);
 
                             fb.remove();
                         })
@@ -172,20 +180,47 @@ function populateList(email) {
         getUserIdByEmail(email, function (uid) {
             pathname = window.location.pathname.split("/");
             planName = pathname[pathname.length - 1];
-            var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/');
-            dataRef.on('value', function (snapshot) {
-                data = [];
-                if (snapshot.val() === null) {
-                    console.log('Workouts for plan ' + planName + ' do not exist.');
-                } else {
+            var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
+            var plansWorkOutsRef = new Firebase('https://jdt.firebaseio.com/Plans/' + planName + '/WorkOuts/');
+            //console.log('asdfasfd' + planName)
+            var userPlansWorkOutsRef = userRef.child(uid + '/Plans/' + planName + '/WorkOuts/');
+            //console.log('fjfjfjfj');
+            //data = [];
+            userPlansWorkOutsRef.on('child_added', function (snapshot) {
+                //console.log('child ');
+                //
+                plansWorkOutsRef.child(snapshot.name()).once("value", function (childSnapshot) {
 
-                    snapshot.forEach(function (childSnapshot) {
-                        var o = $.extend({}, childSnapshot.val()); // does childSnapshot.val() need to be $.parseJSON()'ed? It if it s JSON string it will.
-                        o.DT_RowId = childSnapshot.name();
-                        data.push(o);
+                    var o = childSnapshot.val();
+                    o.DT_RowId = childSnapshot.name();
+
+                    data.push(o);
+               
+                    oTable = $('#datatable-table').dataTable({
+                        "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                        "aaData": data,
+                        "aoColumns": columns,
+                        "oTableTools": {
+                            "sRowSelect": "single",
+                            "aButtons": [
+                                { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
+                            ]
+                        },
+                        bDestroy: true,
+
                     });
 
-                }
+                });
+
+                
+               
+
+
+            });
+           
+            if (typeof oTable != undefined) {
                 oTable = $('#datatable-table').dataTable({
                     "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
                     "aaData": data,
@@ -199,12 +234,14 @@ function populateList(email) {
                         ]
                     },
                     bDestroy: true,
+
                 });
-            });
-
-           
-
+            }
         });
+
+
+
+
     }
 
 
