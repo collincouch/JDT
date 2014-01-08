@@ -613,6 +613,8 @@
     <Content Include="Views\InvitedUsers\Index.cshtml" />
     <Content Include="Views\InvitedUsers\_CreateOrEdit.cshtml" />
     <Content Include="Views\WorkOuts\Search.cshtml" />
+    <Content Include="Views\Shared\_LayoutUnAuth.cshtml" />
+    <Content Include="Views\Account\LogOff.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

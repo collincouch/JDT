@@ -44,8 +44,8 @@ function populateList(email) {
         var data= [];
         var columns = [
 		{ mData: "Name", sTitle: "Name" },
-        { mData: "Description", sTitle: "Description" },
-        { mData: "DateCreated", sTitle: "Date Created" },
+        { mData: "Description", sTitle: "Description",sClass:"hidden-xs" },
+        { mData: "DateCreated", sTitle: "Date Created", sClass:"hidden-xs" },
         {
             sDefaultContent: "0",
             mRender: function (data, type, row) {
@@ -224,6 +224,7 @@ function populateList(email) {
                             ]
                         },
                         "bDestroy": true,
+
                        
                     });
                     

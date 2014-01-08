@@ -11,7 +11,6 @@
         <script src="https://cdn.firebase.com/v0/firebase.js"></script>
         <script src="https://cdn.firebase.com/v0/firebase-simple-login.js"></script>
         <style type="text/css">
-            @@import "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css";
             div.modal-content > form {
                 data-validate:"parsley";
             }
@@ -31,12 +30,16 @@
                     //window.location.replace("../Account/Login");
                 });
 
-
+                $(document).on("click", "#logOutSidNav", function () {
+                    auth1.logout();
+                    //console.log("signing out");
+                    //window.location.replace("../Account/Login");
+                });
 
             });
 
             function initializeAuth(callback) {
-                console.log('Initializing Auth from Layout');
+                //console.log('Initializing Auth from Layout');
                 auth1 = new FirebaseSimpleLogin(jdtRef1, function (error, user) {
                     if (error) {
                         switch (error.code) {

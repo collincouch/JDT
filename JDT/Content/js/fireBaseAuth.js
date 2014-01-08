@@ -2,6 +2,12 @@
 var jdtRef = new Firebase('https://jdt.firebaseio.com');
 var auth;
 
+function LogOut()
+{
+    auth = new Firebase(jdtRef);
+        auth.unauth();
+}
+
 function initializeSimpleLogin(callback)
 {
     try {
