@@ -104,12 +104,14 @@ function populateList(email) {
                                 id = f.push(obj, function (err) {
                                     if (!err) {
                                         root.child('/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' +id).set(true);
+                                        
                                     }
                                     else {
                                         console.log('error ' + err);
                                     }
+                                    successCallback({ "id": 'xxx' });
                                 }).name();
-                                successCallback({ "id": 'xxx' });
+                                
                             });
                         }
                     });
@@ -189,7 +191,7 @@ function populateList(email) {
             userPlansWorkOutsRef.on('child_added', function (snapshot) {
                 //console.log('child ');
                 //
-                plansWorkOutsRef.child(snapshot.name()).once("value", function (childSnapshot) {
+                plansWorkOutsRef.child(snapshot.name()).on("value", function (childSnapshot) {
 
                     var o = childSnapshot.val();
                     o.DT_RowId = childSnapshot.name();
@@ -220,7 +222,8 @@ function populateList(email) {
 
             });
            
-            if (typeof oTable != undefined) {
+            plansWorkOutsRef.on('child_removed', function (snapshot) {
+               
                 oTable = $('#datatable-table').dataTable({
                     "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
                     "aaData": data,
@@ -234,9 +237,8 @@ function populateList(email) {
                         ]
                     },
                     bDestroy: true,
-
                 });
-            }
+            });
         });
 
 

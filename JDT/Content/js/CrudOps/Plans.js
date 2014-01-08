@@ -108,21 +108,26 @@ function populateList(email) {
                     obj.Description = description;
                     obj.DateCreated = getTodaysDate();
                     obj.DateModified = getTodaysDate();
+                    obj.CreatedBy = uid;
                     url1 = 'https://jdt.firebaseio.com/Plans/';
                     var root = new Firebase("https://jdt.firebaseio.com");
                     var f = new Firebase(url1);
                     id = f.push(obj, function (err) {
+                        
                         if (!err) {
-                            root.child('/Users/user/' + uid + '/Plans/' + id).set(true);
+                            root.child('/Users/user/' + uid + '/Plans/' + id).set(Firebase.ServerValue.TIMESTAMP);
+                            
                         }
+                        
                     }).name();
 
                     successCallback({ "id": 'xxx' });
                     
                             });
                         }
+                        
                     });
-        
+                   
                 }
                 else if (data.action === 'edit') {
                     id = data.id;
@@ -130,6 +135,8 @@ function populateList(email) {
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
                             var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + data.id);
+                            var fbUser = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + data.id);
+
                             var name = data.data.Name;
                             //console.log('data ' + JSON.stringify(data) + ' DateCreated ' + output + ' uid ' + uid);
                             var description = data.data.Description;
@@ -139,6 +146,7 @@ function populateList(email) {
                                     "Description": description,
                                     "DateModified": getTodaysDate()
                                 });
+                                fbUser.set(Firebase.ServerValue.TIMESTAMP);
                                 
                             } catch (e) {
                                 console.log(JSON.stringify(e));
@@ -155,10 +163,11 @@ function populateList(email) {
                         getUserIdByEmail(email, function (uid) {
                             console.log('remove ' + JSON.stringify(data));
                     var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + data.data[0]);
-
+                    var fbUser = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + data.data[0]);
                     //console.log('id ' + data.data[0]);
                     fb.remove();
-                    console.log('id ' + data.data[0]);
+                    fbUser.remove();
+                    //console.log('id ' + data.data[0]);
                     
 
                         })
@@ -192,22 +201,25 @@ function populateList(email) {
             editor.on('onCreate', function (json,data) {
 
                 var nRow = $('#xxx')[0];
-
+                
                 oTable.fnDeleteRow(nRow);
+                
             });
            
         
        
 
         getUserIdByEmail(email, function (uid) {
+            var planId="";
             var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
             var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
+             
             var userPlansRef = userRef.child(uid + '/Plans/');
             
             userPlansRef.on('child_added', function (snapshot) {
                 //console.log('child ' + snapshot.name());
                 //data = [];
-                plansRef.child(snapshot.name()).once("value", function (childSnapshot) {
+                plansRef.child(snapshot.name()).on("value", function (childSnapshot) {
 
                         var o = childSnapshot.val();
                         o.DT_RowId = childSnapshot.name();
@@ -231,19 +243,92 @@ function populateList(email) {
 
                         });
 
-                }
-
-
-                    );
-                    
-              
-               
-                    
-    
+                });
             });
            
-            console.log('data ' + JSON.stringify(data));
-            
+            userPlansRef.on('child_removed', function (snapshot) {
+                //console.log('child ' + snapshot.name());
+                data = [];
+                plansRef.on("value", function (childSnapshot) {
+                    //data = [];
+                    childSnapshot.forEach(function (x) {
+                        var o = $.extend({}, x.val());
+                        o.DT_RowId = x.name();
+                        data.push(o);
+
+                    });
+
+                    oTable = $('#datatable-table').dataTable({
+                        "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                        "aaData": data,
+                        "aoColumns": columns,
+                        "oTableTools": {
+                            "sRowSelect": "single",
+                            "aButtons": [
+                                { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
+                            ]
+                        },
+                        "bDestroy": true,
+
+
+                    });
+
+                });
+            });
+              
+            userPlansRef.on('child_changed', function (snapshot) {
+                //console.log('child ' + snapshot.name());
+                //data = [];
+                plansRef.on("value", function (childSnapshot) {
+                    data = [];
+                    childSnapshot.forEach(function (x) {
+                        var o = $.extend({}, x.val());
+                        o.DT_RowId = x.name();
+                        data.push(o);
+
+                    });
+
+                    oTable = $('#datatable-table').dataTable({
+                        "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                        "aaData": data,
+                        "aoColumns": columns,
+                        "oTableTools": {
+                            "sRowSelect": "single",
+                            "aButtons": [
+                                { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
+                                { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
+                            ]
+                        },
+                        "bDestroy": true,
+
+
+                    });
+
+                });
+            });
+
+            //console.log('table ' + oTable);
+            if (typeof oTable === "undefined") {
+                oTable = $('#datatable-table').dataTable({
+                    "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                    "aaData": data,
+                    "aoColumns": columns,
+                    "oTableTools": {
+                        "sRowSelect": "single",
+                        "aButtons": [
+                            { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
+                            { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
+                            { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
+                        ]
+                    },
+                    "bDestroy": true,
+
+
+                });
+            }
         });
 
 
