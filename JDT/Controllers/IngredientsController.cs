@@ -28,49 +28,7 @@ namespace JDT.Controllers
             return View();
         }
 
-        //
-        // GET: /Ingredients/Details/5
-
-        [MvcSiteMapNode(Title = "Details", ParentKey = "Ingredient")]
-        public ViewResult Details(string id, string id1, string id2, string id3)
-        {
-           
-            return View();
-        }
-
-        //
-        // GET: /Ingredients/Create
-        [MvcSiteMapNode(Title = "Add", ParentKey = "Ingredient")]
-        public ActionResult Create(string id, string id1, string id2)
-        {
-            
-            return View();
-        } 
-
        
-        
-        //
-        // GET: /Ingredients/Edit/5
-
-        [MvcSiteMapNode(Title = "Edit", ParentKey = "Ingredient")]
-        public ActionResult Edit(string id, string id1, string id2, string id3 )
-        {
-           
-            return View();
-        }
-
-       
-
-        //
-        // GET: /Ingredients/Delete/5
-
-        [MvcSiteMapNode(Title = "Delete", ParentKey = "Ingredient")]
-        public ActionResult Delete(string id, string id1, string id2, string id3)
-        {
-           
-            return View();
-        }
-
        
 
         protected override void Dispose(bool disposing)

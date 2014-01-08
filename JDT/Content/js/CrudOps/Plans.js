@@ -79,7 +79,19 @@ function populateList(email) {
                 "default": getTodaysDate()
             }
             ],
-            
+            "i18n": {
+                "create": {
+                    "title": "<h4>Give your fitness plan a name and description and click 'Create'</h4>",
+                },
+                "edit": {
+                    "title": "<h4>Edit your fitness plan's name and description and click 'Update'</h4>",
+                },
+                "remove": {
+                    "title": "<h4>Delete your fitness plan and all assocated workouts and exercises.</h4>",
+                    "confirm": { "1": "Are you sure you wish to delete this fitness plan?  All assocated workouts and exercises will be deleted, too." },
+
+                },
+                },
             "ajax": function (method, url, data, successCallback, errorCallback) {
 
                
@@ -208,7 +220,7 @@ function populateList(email) {
                             "aButtons": [
                                 { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
                                 { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
-                                { "sExtends": "editor_remove", "editor": editor }
+                                { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
                             ]
                         },
                         "bDestroy": true,

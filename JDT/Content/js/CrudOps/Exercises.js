@@ -109,6 +109,18 @@ function populateList(email) {
          },
         
         ],
+            "i18n": {
+                "create": {
+                    "title": "<h4>Give your exercise a name, description, set range, rep range, duration, and click 'Create'</h4>",
+                    },
+                "edit": {
+                    "title": "<h4>Edit your exercises and click 'Update'</h4>",
+                    },
+                "remove": {
+                    "title": "<h4>Delete your exercise.</h4>",
+                    "confirm": {"1":"Are you sure you wish to delete this exercise?"}
+                },
+            },
         "ajax": function (method, url, data, successCallback, errorCallback) {
 
             var id = null;
@@ -119,8 +131,8 @@ function populateList(email) {
                     if (email) {
                         getUserIdByEmail(email, function (uid) {
                             pathname = window.location.pathname.split("/");
-                            planName = pathname[pathname.length - 1];
-                            workOutName = pathname[pathname.length - 2];
+                            planName = pathname[pathname.length - 2];
+                            workOutName = pathname[pathname.length - 1];
                             obj.Name = data.data.Name;
                             obj.Description = data.data.Description;
                             obj.DateCreated = getTodaysDate();
@@ -144,10 +156,8 @@ function populateList(email) {
                 //console.log('edit id' + data.id);
                 initializeAuth(function (email) {
                     getUserIdByEmail(email, function (uid) {
-                        pathname = window.location.pathname.split("/");
-                        planName = pathname[pathname.length - 1];
-                        workOutName = pathname[pathname.length - 2];
-                        var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + workOutName + 'Exercises/' + data.id);
+
+                        var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + workOutName + '/Exercises/' + data.id);
                         obj.Name = data.data.Name;
                         obj.Description = data.data.Description;
                         obj.DateModified = getTodaysDate();
@@ -156,6 +166,8 @@ function populateList(email) {
                         obj.RecMinReps = data.data.RecMinReps;
                         obj.RecMaxReps = data.data.RecMaxReps;
                         obj.RecDuration = data.data.RecDuration;
+                        //console.log('exercise name ' + fb.name());
+                        console.log('obj ' + JSON.stringify(obj));
                         try {
                             fb.update(obj);
                         } catch (e) {
@@ -169,9 +181,7 @@ function populateList(email) {
 
                 initializeAuth(function (email) {
                     getUserIdByEmail(email, function (uid) {
-                        pathname = window.location.pathname.split("/");
-                        planName = pathname[pathname.length - 1];
-                        workOutName = pathname[pathname.length - 2];
+
                         var fb = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + "/WorkOuts/" + workOutName + '/Exercises/' +  data.data[0]);
 
                         fb.remove();
@@ -208,8 +218,8 @@ function populateList(email) {
     });
         getUserIdByEmail(email, function (uid) {
             pathname = window.location.pathname.split("/");
-            planName = pathname[pathname.length - 1];
-            workOutName = pathname[pathname.length - 2];
+            planName = pathname[pathname.length - 2];
+            workOutName = pathname[pathname.length - 1];
             var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName + '/Exercises/');
             dataRef.on('value', function (snapshot) {
                 data = [];
@@ -235,7 +245,7 @@ function populateList(email) {
                         "aButtons": [
                             { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
                             { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
-                            { "sExtends": "editor_remove", "editor": editor }
+                            { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
                         ]
                     },
                     bDestroy: true,

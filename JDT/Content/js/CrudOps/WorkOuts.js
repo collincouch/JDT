@@ -48,7 +48,7 @@ function populateList(email) {
             sDefaultContent: "0",
             mRender: function (data, type, row) {
                 //console.log(row);
-                var returnVal = row.Exercises == null ? "<a href=\"/Exercises/Index/" + row.DT_RowId + "/" + planName + "\">0</a>" : "<a href=\"/Exercises/Index/" + row.DT_RowId + "/" + planName + "\">" + countProperties(row.Exercises) + "</a>";
+                var returnVal = row.Exercises == null ? "<a href=\"/Exercises/Index/" + planName + "/" + row.DT_RowId + "\">0</a>" : "<a href=\"/Exercises/Index/" +planName + "/" + row.DT_RowId + "\">" + countProperties(row.Exercises) + "</a>";
                 return returnVal;
             },
             "aTargets": [3]
@@ -71,6 +71,18 @@ function populateList(email) {
                 "default": getTodaysDate()
             }
             ],
+            "i18n": {
+                "create": {
+                    "title": "<h4>Give your workout a name and description and click 'Create'</h4>",
+                },
+                "edit": {
+                    "title": "<h4>Edit your workout's name and description and click 'Update'</h4>",
+                },
+                "remove": {
+                    "title": "<h4>Delete your workout and all assocated exercises.</h4>",
+                    "confirm": {"1":"Are you sure you wish to delete this workout?  All assocated exercises will be deleted, too."}
+                },
+            },
             "ajax": function (method, url, data, successCallback, errorCallback) {
 
                 var id = null;
@@ -183,7 +195,7 @@ function populateList(email) {
                         "aButtons": [
                             { "sExtends": "editor_create", "editor": editor, "sButtonClass": "btn btn-primary" },
                             { "sExtends": "editor_edit", "editor": editor, "sButtonClass": "btn btn-primary" },
-                            { "sExtends": "editor_remove", "editor": editor }
+                            { "sExtends": "editor_remove", "editor": editor, "sButtonClass": "btn btn-warning" }
                         ]
                     },
                     bDestroy: true,
@@ -215,10 +227,6 @@ function populateList(email) {
                             $('#Description').text(snapshot.val().Description);
                             $('#DateCreated').text(snapshot.val().DateCreated);
                             $('#DateModified').text(snapshot.val().DateModified);
-
-
-
-
                             $('#Exercises').val(dataRef.parent().child('Exercises').numChildren());
 
 

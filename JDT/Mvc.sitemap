@@ -4,47 +4,19 @@
             xsi:schemaLocation="http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0 MvcSiteMapSchema.xsd">
 
   <mvcSiteMapNode title="Dashboard" controller="Dashboard" action="Index" key="Dashboard">
-    <mvcSiteMapNode title="Plans" controller="Plans" action="Index" key="Plan">
-      <mvcSiteMapNode title="Add" controller="Plans" action="Create"/>
-      <mvcSiteMapNode title="Edit" controller="Plans" action="Edit"/>
-      <mvcSiteMapNode title="Details" controller="Plans" action="Details"/>
-      <mvcSiteMapNode title="Delete" controller="Plans" action="Delete"/>
-      <mvcSiteMapNode title="Workouts" controller="Workouts" action="Index" preservedRouteParameters="id" key="WorkOut">
-        <mvcSiteMapNode title="Add" controller="Workouts" action="Create"/>
-        <mvcSiteMapNode title="Edit" controller="Workouts" action="Edit"/>
-        <mvcSiteMapNode title="Details" controller="Workouts" action="Details"/>
-        <mvcSiteMapNode title="Delete" controller="Workouts" action="Delete"/>
+    <mvcSiteMapNode title="Fitness Plans" controller="Plans" action="Index" key="Plan">
+      <mvcSiteMapNode title="Workouts" controller="WorkOuts" action="Index" preservedRouteParameters="id" key="WorkOut">
         <mvcSiteMapNode title="Exercises" controller="Exercises" action="Index" preservedRouteParameters="id, id1" key="Exercise">
-          <mvcSiteMapNode title="Add" controller="Exercises" action="Create"/>
-          <mvcSiteMapNode title="Edit" controller="Exercises" action="Edit"/>
-          <mvcSiteMapNode title="Details" controller="Exercises" action="Details"/>
-          <mvcSiteMapNode title="Delete" controller="Exercises" action="Delete"/>
         </mvcSiteMapNode>
       </mvcSiteMapNode>
       <mvcSiteMapNode title="Diets" controller="Diets" action="Index" preservedRouteParameters="id" key="Diet">
-        <mvcSiteMapNode title="Add" controller="Diets" action="Create"/>
-        <mvcSiteMapNode title="Edit" controller="Diets" action="Edit"/>
-        <mvcSiteMapNode title="Details" controller="Diets" action="Details"/>
-        <mvcSiteMapNode title="Delete" controller="Diets" action="Delete"/>
         <mvcSiteMapNode title="Recipes" controller="Recipes" action="Index" preservedRouteParameters="id, id1" key="Recipe">
-          <mvcSiteMapNode title="Add" controller="Recipes" action="Create"/>
-          <mvcSiteMapNode title="Edit" controller="Recipes" action="Edit"/>
-          <mvcSiteMapNode title="Details" controller="Recipes" action="Details"/>
-          <mvcSiteMapNode title="Delete" controller="Recipes" action="Delete"/>
           <mvcSiteMapNode title="Ingredients" controller="Ingredients" action="Index" preservedRouteParameters="id, id1, id2" key="Ingredient">
-            <mvcSiteMapNode title="Add" controller="Ingredients" action="Create"/>
-            <mvcSiteMapNode title="Edit" controller="Ingredients" action="Edit"/>
-            <mvcSiteMapNode title="Details" controller="Ingredients" action="Details"/>
-            <mvcSiteMapNode title="Delete" controller="Ingredients" action="Delete"/>
           </mvcSiteMapNode>
         </mvcSiteMapNode>
       </mvcSiteMapNode>
       </mvcSiteMapNode>
     <mvcSiteMapNode title="Friends" controller="InvitedUsers" action="Index" key="InvitedUser">
-      <mvcSiteMapNode title="Add" controller="InvitedUsers" action="Create"/>
-      <mvcSiteMapNode title="Edit" controller="InvitedUsers" action="Edit"/>
-      <mvcSiteMapNode title="Details" controller="InvitedUsers" action="Details"/>
-      <mvcSiteMapNode title="Delete" controller="InvitedUsers" action="Delete"/>
     </mvcSiteMapNode>
  </mvcSiteMapNode>
   

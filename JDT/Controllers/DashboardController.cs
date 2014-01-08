@@ -1,4 +1,5 @@
 ﻿using JDT.App_Code;
+using MvcSiteMapProvider;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace JDT.Controllers
     {
         //
         // GET: /Dashboard/
+
 
         public ActionResult Index()
         {

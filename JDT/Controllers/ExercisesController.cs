@@ -27,41 +27,6 @@ namespace JDT.Controllers
 
         
 
-        //
-        // GET: /JdtTasks/Details/5
-        [MvcSiteMapNode(Title = "Details", ParentKey = "Exercise")]
-        public ViewResult Details(string id, string id1, string id2)
-        {
-            return View();
-        }
-
-        //
-        // GET: /JdtTasks/Create
-        [MvcSiteMapNode(Title = "Add", ParentKey = "Exercise")]
-        public ActionResult Create()
-        {
-            
-            return View();
-        } 
-
-          
-        //
-        // GET: /JdtTasks/Edit/5
-        [MvcSiteMapNode(Title = "Edit", ParentKey = "Exercise")]
-        public ActionResult Edit(string id, string id1, string id2)
-        {
-            return View();
-        }
-
-
-        //
-        // GET: /JdtTasks/Delete/5
-
-         [MvcSiteMapNode(Title = "Delete", ParentKey = "Exercise")]
-        public ActionResult Delete(string id, string id1, string id2)
-        {
-            return View();
-        }
 
         
 
