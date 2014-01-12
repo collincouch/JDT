@@ -1,5 +1,4 @@
-﻿var pathname;
-var planName;
+﻿
 var editor;
 var oTable;
 var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
@@ -7,6 +6,15 @@ var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
 var userPlansRef;
 var records = [];
 var columns;
+
+jQuery.removeFromArray = function (value, arr) {
+    //console.log('object to be removed ' + JSON.stringify(value));
+    return jQuery.grep(arr, function (elem, index) {
+        //console.log(' removing ' + elem.DT_RowId);
+        return elem.DT_RowId !== value;
+    });
+};
+
 
 function initListAuth() {
     initializeAuth(function (email) {
@@ -17,6 +25,7 @@ function initListAuth() {
 }
 
 function countProperties(obj) {
+    //console.log('counting props');
     var prop;
     var propCount = 0;
 
@@ -54,7 +63,8 @@ function populateList(email) {
             sDefaultContent: "0",
             mRender: function (data, type, row) {
                 if(type=="display"){
-                //console.log(JSON.stringify(row));
+                    console.log(JSON.stringify(row));
+                    //console.log(data[3]);
                 var returnVal = row.WorkOuts == null ? "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">0</a>" : "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">" + countProperties(row.WorkOuts) + "</a>";
                 return returnVal;
                 }
@@ -78,6 +88,9 @@ function populateList(email) {
                 "name": "DateCreated",
                 "type": "hidden",
                 "default": getTodaysDate()
+            }, {
+                "name": "DT_RowId",
+                "type": "hidden",
             }
             ],
             "i18n": {
@@ -101,8 +114,9 @@ function populateList(email) {
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
                             
-                            var fb = new Firebase('https://jdt.firebaseio.com/Plans/');
-                            var fbUser = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/');
+                            //var fb = new Firebase('https://jdt.firebaseio.com/Plans/');
+                            //var fbUser = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/');
+                            userPlansRef = userRef.child(uid).child('Plans');
 
                             var name = data.data.Name;
 
@@ -114,15 +128,14 @@ function populateList(email) {
                             obj.DateCreated = getTodaysDate();
                             //console.log('asdfasdf');
                             try {
-                                //console.log('asdfasdf');
-                                //userPlansRef.off('child_added', usersPlansAdded);
+
                                 userPlansRef.off('child_changed', usersPlansChanged);
-                                id = fb.push(obj, function (err) {
+                                id = plansRef.push(obj, function (err) {
                                     if (!err) {
                                         //console.log('id ' + id);
-                                            fbUser.child(id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                                            userPlansRef.child(id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
                                                 if (!err) {
-                                                    //userPlansRef.on('child_added', usersPlansAdded);
+                                                    
                                                     userPlansRef.on('child_changed', usersPlansChanged);
                                                     successCallback({ "id": id });
                                                 }
@@ -133,8 +146,8 @@ function populateList(email) {
                                
 
                             } catch (e) {
-                                //userPlansRef.on('child_added', usersPlansAdded);
-                                console.log(JSON.stringify(e));
+                                userPlansRef.on('child_changed', usersPlansChanged);
+                                console.log('An error occured ' + JSON.stringify(e));
                             }
                             
                             
@@ -142,68 +155,70 @@ function populateList(email) {
                     });
                 }
                 else if (data.action === 'edit') {
-                    id = data.id;
-                    
                    
+                    id = data.id;
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
                             
-                            var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + id);
-                            var fbUser = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + id);
-                            
+                            userPlansRef = userRef.child(uid + '/Plans/' + id);
                             var name = data.data.Name;
-                            
-                            obj.Name = name;
-                            
                             var description = data.data.Description;
+                            obj.Name = name;
                             obj.Description = description;
                             obj.DateModified = getTodaysDate();
                             
                             try {
-                                userPlansRef.off('child_changed', usersPlansChanged);
-                                fb.update(obj, function (err) {
+                                userPlansRef.parent().off('child_changed', usersPlansChanged);
+                                //console.log('userPlansRef.parent() is ' + userPlansRef.parent().toString());
+                                plansRef.child(id).update(obj, function (err) {
                                     if (!err) {
                                         //console.log('setting ' + err);
-                                        fbUser.set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                                        userPlansRef.set(Firebase.ServerValue.TIMESTAMP, function (err) {
+
+                                            userPlansRef.parent().on('child_changed', usersPlansChanged);
+                                            successCallback({ "id": id });
+                                           
                                             
-                                            if (!err) {
-                                                userPlansRef.on('child_changed', usersPlansChanged);
-                                                successCallback({ "id": id });
-                                                //initializeDataTable();
-                                            }
+
                                         });
+
                                     }
+                                    else {
+                                        userPlansRef.parent().on('child_changed', usersPlansChanged);
+                                        console.log('error occured editing plans ');
+                                        successCallback({ "id": id });
+                                    }
+
+                                    
                                 });
                                 
                                 
                             } catch (e) {
-                                //userPlansRef.on('child_changed', usersPlansChanged);
-                                console.log(JSON.stringify(e));
+                                userPlansRef.parent().on('child_changed', usersPlansChanged);
+                                console.log('an error ocured ' + JSON.stringify(e));
                             }
                             
                             
                         });
                     });
 
-                   
+                    
                     
                 }
                 else if (data.action === 'remove') {
                     
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
-                            //console.log('remove ' + JSON.stringify(data));
-                    var fb = new Firebase('https://jdt.firebaseio.com/Plans/' + data.data[0]);
-                    var fbUser = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + data.data[0]);
-                    var r = [];
-                    userPlansRef.off('child_removed', usersPlansRemoved);
-                    fb.remove(function (err) {
+                                  userPlansRef = userRef.child(uid + '/Plans/' + data.data[0]);
+                            var r = [];
+                    userPlansRef.parent().off('child_removed', usersPlansRemoved);
+                    plansRef.child(data.data[0]).remove(function (err) {
                         if (!err) {
-                            fbUser.remove(function (err) {
+                            userPlansRef.remove(function (err) {
                                 if (!err) {
                                     r = jQuery.removeFromArray(data.data[0], records);
                                     records = r;
-                                    userPlansRef.on('child_removed', usersPlansRemoved);
+                                    userPlansRef.parent().on('child_removed', usersPlansRemoved);
                                     successCallback({ "id": null });
                                 }
                             });
@@ -239,24 +254,9 @@ function populateList(email) {
                         return false;
                 }
             });
-        
-            //editor.on('onPreCreate', function (json, data) {
-            //    userPlansRef.off('child_added', usersPlansAdded);
-            //    //userPlansRef.off('child_changed', usersPlansChanged);
-            //});
 
-            //editor.on('onPostCreate', function (json, data) {
-            //    userPlansRef.on('child_added', usersPlansAdded);
-            //    //userPlansRef.on('child_changed', usersPlansChanged);
-            //});
+            
 
-            //editor.on('onPreEdit', function (json, data) {
-            //    userPlansRef.off('child_changed', usersPlansChanged);
-            //});
-
-            //editor.on('onPostEdit', function (json, data) {
-            //    userPlansRef.on('child_changed', usersPlansChanged);
-            //});
 
         getUserIdByEmail(email, function (uid) {
           
@@ -273,13 +273,6 @@ function populateList(email) {
 
 }
 
-jQuery.removeFromArray = function (value, arr) {
-    //console.log('object to be removed ' + JSON.stringify(value));
-    return jQuery.grep(arr, function (elem, index) {
-        //console.log(' removing ' + elem.DT_RowId);
-        return elem.DT_RowId !== value;
-    });
-};
 
 
 
@@ -301,12 +294,13 @@ var usersPlansAdded = function (snapShot) {
 
 var usersPlansChanged = function (snapShot) {
     console.log('changed');
-    var i = 0;
+    
     
     plansRef.child(snapShot.name()).on("value", function (childSnapShot) {
         //console.log('plan changed ' + JSON.stringify(childSnapShot.val()));
         //console.log('record length ' + records.length);
         var o = childSnapShot.val();
+        var i = 0;
         $.each(records, function () {
             //console.log('this dtrowid ' + this.DT_RowId + ' snap ' + childSnapShot.name());
             //console.log('snap name ' + childSnapshot.name());
@@ -319,7 +313,7 @@ var usersPlansChanged = function (snapShot) {
             i++;
         });
         records[i] = o;
-       
+        //console.log
         initializeDataTable();
 
     });
@@ -363,40 +357,6 @@ function initializeDataTable() {
 }
 
 
-
-    function initDetailsAuth() {
-        initializeAuth(function (email) {
-            if (email) {
-                setHeader(email);
-                setSideNav(email);
-                getUserIdByEmail(email, function (uid) {
-                    pathname = window.location.pathname.split("/");
-                    planName = pathname[pathname.length - 1];
-                    //console.log(uid);
-                    var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName);
-                    dataRef.on('value', function (snapshot) {
-                        if (snapshot.val() === null) {
-                            alert('plan ' + planName + ' does not exist.');
-                        } else {
-                           // $('#Name').text(snapshot.val().Name);
-                           // $('#Description').text(snapshot.val().Description);
-                           // $('#DateCreated').text(snapshot.val().DateCreated);
-                           // $('#DateModified').text(snapshot.val().DateModified);
-                           // $('#Exercises').val(dataRef.parent().child('Exercises').numChildren());
-
-
-                        }
-
-                    });
-
-
-                });
-            }
-
-        });
-    }
-
-   
 
        
 

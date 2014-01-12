@@ -1,13 +1,24 @@
-﻿var pathname;
-var planName;
-var workOutName;
+﻿
 var editor;
 var oTable;
+var pathname = window.location.pathname.split("/");
+var planName = pathname[pathname.length - 1];
 var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
 var workOutsRef = new Firebase('https://jdt.firebaseio.com/WorkOuts/');
-var userWorkOutsRef;
+var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
+var planWorkOutsRef = plansRef.child(planName + '/WorkOuts/');
+var userPlansRef;
 var records = [];
 var columns;
+
+
+jQuery.removeFromArray = function (value, arr) {
+    //console.log('object to be removed ' + JSON.stringify(value));
+    return jQuery.grep(arr, function (elem, index) {
+        //console.log(' removing ' + elem.DT_RowId);
+        return elem.DT_RowId !== value;
+    });
+};
 
 function initListAuth() {
     initializeAuth(function (email) {
@@ -40,11 +51,8 @@ function getTodaysDate() {
 
 
 function populateList(email) {
-        pathname = window.location.pathname.split("/");
-        planName = pathname[pathname.length - 1];
         var obj = {};
-        var url;
-        var columns = [
+        columns = [
 		{ mData: "Name", sTitle: "Name" },
         { mData: "Description", sTitle: "Description", sClass:"hidden-xs" },
         { mData: "DateCreated", sTitle: "Date Created", sClass:"hidden-xs" },
@@ -73,6 +81,9 @@ function populateList(email) {
                 "name": "DateCreated",
                 "type": "hidden",
                 "default": getTodaysDate()
+            }, {
+                "name": "DT_RowId",
+                "type": "hidden",
             }
             ],
             "i18n": {
@@ -92,31 +103,35 @@ function populateList(email) {
                 var id = null;
                 if (data.action === 'create') {
                     initializeAuth(function (email) {
-                        pathname = window.location.pathname.split("/");
-                        planName = pathname[pathname.length - 1];
                         if (email) {
                             getUserIdByEmail(email, function (uid) {
                                 var name = data.data.Name;
                                 var description = data.data.Description;
-
+                                userPlansRef = userRef.child(uid).child('Plans');
 
                                 obj.Name = name;
                                 obj.Description = description;
                                 obj.DateCreated = getTodaysDate();
                                 obj.DateModified = getTodaysDate();
                                 obj.CreatedBy = uid;
-                                url1 = 'https://jdt.firebaseio.com/WorkOuts/';
-                                var root = new Firebase("https://jdt.firebaseio.com");
-                                var f = new Firebase(url1);
-                                userWorkOutsRef.off('child_added', usersWorkOutsAdded);
-                                id = f.push(obj, function (err) {
-
+                                
+                                console.log('userPlansRef Url ' + userPlansRef.child(planName).toString());
+                                
+                                planWorkOutsRef.off('child_changed', planWorkOutsChanged);
+                                //userPlansRef.child(planName).off('child_changed');
+                                //planWorkOutsRef.off('child_added', planWorkOutsAdded);
+                                id = workOutsRef.push(obj, function (err) {
                                     if (!err) {
-                                        root.child('/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
-                                            userWorkOutsRef.on('child_added', usersWorkOutsAdded);
-                                            successCallback({ "id": 'xxx' });
+                                        //console.log('planWorkOutsRef inside create ' + planWorkOutsRef.toString());
+                                        planWorkOutsRef.child(id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                                            if (!err) {
+                                                
+                                                userPlansRef.child(planName).set(Firebase.ServerValue.TIMESTAMP);
+                                                planWorkOutsRef.on('child_changed', planWorkOutsChanged);
+                                                successCallback({ "id": id });
+                                                
+                                            }
                                         });
-
                                     }
 
                                 }).name();
@@ -131,74 +146,62 @@ function populateList(email) {
                 }
                 else if (data.action === 'edit') {
                     id = data.id;
-
-
                     initializeAuth(function (email) {
-                        pathname = window.location.pathname.split("/");
-                        planName = pathname[pathname.length - 1];
-
-                        getUserIdByEmail(email, function (uid) {
-
-                            var fb = new Firebase('https://jdt.firebaseio.com/WorkOuts/' + id);
-                            var fbUser = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/');
 
                             var name = data.data.Name;
-
-                            obj.Name = name;
-
                             var description = data.data.Description;
+                            obj.Name = name;
                             obj.Description = description;
                             obj.DateModified = getTodaysDate();
 
                             try {
-                                userWorkOutsRef.off('child_changed', usersWorkOutsChanged);
-                                fb.update(obj, function (err) {
+                                planWorkOutsRef.off('child_changed', planWorkOutsChanged);
+                               
+                                workOutsRef.child(id).update(obj, function (err) {
                                     if (!err) {
                                         //console.log('setting ' + err);
-                                        fbUser.set(Firebase.ServerValue.TIMESTAMP, function (err) {
-
-                                            userWorkOutsRef.on('child_changed', usersWorkOutsChanged);
+                                        planWorkOutsRef.child(id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                                            planWorkOutsRef.on('child_changed', planWorkOutsChanged);
+                                            successCallback({ "id": id });
                                         });
                                     }
                                 });
 
 
                             } catch (e) {
-                                userWorkOutsRef.on('child_changed', usersWorkOutsChanged);
+                                planWorkOutsRef.on('child_changed', planWorkOutsChanged);
                                 console.log(JSON.stringify(e));
                             }
 
-                            successCallback({ "id": id });
-                        });
+                            
+                        
                     });
                 }
                 else if (data.action === 'remove') {
-                    pathname = window.location.pathname.split("/");
-                    planName = pathname[pathname.length - 1];
                     initializeAuth(function (email) {
-                        getUserIdByEmail(email, function (uid) {
-                            //console.log('remove ' + JSON.stringify(data));
-                            var fb = new Firebase('https://jdt.firebaseio.com/WorkOuts/' + data.data[0]);
-                            var fbUser = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' +  data.data[0]);
+                        try {
                             var r = [];
-                            userWorkOutsRef.off('child_removed', usersWorkOutsRemoved);
-                            fb.remove(function (err) {
+                            planWorkOutsRef.off('child_removed', planWorkOutsRemoved);
+                            workOutsRef.child(data.data[0]).remove(function (err) {
                                 if (!err) {
-                                    fbUser.remove(function (err) {
-                                        if (!err) {
+                                    planWorkOutsRef.child(data.data[0]).remove(function (err) {
+                                        
                                             r = jQuery.removeFromArray(data.data[0], records);
                                             records = r;
-                                            userWorkOutsRef.on('child_removed', usersWorkOutsRemoved);
+                                            planWorkOutsRef.on('child_removed', planWorkOutsRemoved);
                                             successCallback({ "id": null });
-                                        }
+                                        
                                     });
                                 }
 
                             });
+                        } catch (e) {
+                            planWorkOutsRef.on('child_removed', planWorkOutsRemoved);
+                        }
 
 
                         })
-                    })
+                    
                 }
                 
             }
@@ -221,24 +224,19 @@ function populateList(email) {
             }
         });
 
-        editor.on('onCreate', function (json, data) {
-
-            var nRow = $('#xxx')[0];
-
-            oTable.fnDeleteRow(nRow);
-        });
+    
 
         getUserIdByEmail(email, function (uid) {
-            pathname = window.location.pathname.split("/");
-            planName = pathname[pathname.length - 1];
-           
-            userWorkOutsRef = userRef.child(uid + '/Plans/' + planName + '/WorkOuts/');
+            
+            initializeDataTable();
 
-            userWorkOutsRef.on('child_added', usersWorkOutsAdded);
+            planWorkOutsRef = plansRef.child(planName + '/WorkOuts/');
+            //console.log('planWorkOutRef ' + planWorkOutsRef.toString());
+            planWorkOutsRef.on('child_added', planWorkOutsAdded);
 
-            userWorkOutsRef.on('child_changed', usersWorkOutsChanged);
+            planWorkOutsRef.on('child_changed', planWorkOutsChanged);
 
-            userWorkOutsRef.on('child_removed', usersWorkOutsRemoved);
+            planWorkOutsRef.on('child_removed', planWorkOutsRemoved);
 
         });
 
@@ -247,19 +245,13 @@ function populateList(email) {
 
     }
 
-jQuery.removeFromArray = function (value, arr) {
-    //console.log('object to be removed ' + JSON.stringify(value));
-    return jQuery.grep(arr, function (elem, index) {
-        //console.log(' removing ' + elem.DT_RowId);
-        return elem.DT_RowId !== value;
-    });
-};
 
-var usersWorkOutsAdded = function (snapShot) {
-
+var planWorkOutsAdded = function (snapShot) {
+    console.log('work out added');
     workOutsRef.child(snapShot.name()).once("value", function (childSnapShot) {
 
         var o = childSnapShot.val();
+        //console.log
         o.DT_RowId = childSnapShot.name();
 
         records.push(o);
@@ -267,16 +259,19 @@ var usersWorkOutsAdded = function (snapShot) {
         initializeDataTable();
 
     });
+
+    //console.log('records length ' + records.length);
 }
 
-var usersWorkOutsChanged = function (snapShot) {
-    //console.log('changed');
-    var i = 0;
+var planWorkOutsChanged = function (snapShot) {
+    console.log('changed');
+    
 
     workOutsRef.child(snapShot.name()).on("value", function (childSnapShot) {
         //console.log('plan changed ' + JSON.stringify(childSnapShot.val()));
         //console.log('record length ' + records.length);
         var o = childSnapShot.val();
+        var i = 0;
         $.each(records, function () {
             //console.log('this dtrowid ' + this.DT_RowId + ' snap ' + childSnapShot.name());
             //console.log('snap name ' + childSnapshot.name());
@@ -296,20 +291,12 @@ var usersWorkOutsChanged = function (snapShot) {
 
 }
 
-jQuery.removeFromArray = function (value, arr) {
-    //console.log('object to be removed ' + JSON.stringify(value));
-    return jQuery.grep(arr, function (elem, index) {
-        //console.log(' removing ' + elem.DT_RowId);
-        return elem.DT_RowId !== value;
-    });
-};
-
-var usersWorkOutsRemoved = function (snapShot) {
+var planWorkOutsRemoved = function (snapShot) {
     //console.log('record length before ' + records.length);
     var r = [];
 
 
-    plansRef.child(snapShot.name()).on("value", function (childSnapShot) {
+    workOutsRef.child(snapShot.name()).on("value", function (childSnapShot) {
         //console.log('value ' + childSnapShot.name());
 
         r = jQuery.removeFromArray(childSnapShot.name(), records);
@@ -340,36 +327,5 @@ function initializeDataTable() {
     });
 }
 
-    function initDetailsAuth() {
-        initializeAuth(function (email) {
-            if (email) {
-                setHeader(email);
-                setSideNav(email);
-                getUserIdByEmail(email, function (uid) {
-                    pathname = window.location.pathname.split("/");
-                    planName = pathname[pathname.length - 1];
-                    workOutName = pathname[pathname.length - 2];
-                    //console.log(uid);
-                    var dataRef = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/' + planName + '/WorkOuts/' + workOutName);
-                    dataRef.on('value', function (snapshot) {
-                        if (snapshot.val() === null) {
-                            alert('workout ' + workOutName + ' does not exist.');
-                        } else {
-                            $('#Name').text(snapshot.val().Name);
-                            $('#Description').text(snapshot.val().Description);
-                            $('#DateCreated').text(snapshot.val().DateCreated);
-                            $('#DateModified').text(snapshot.val().DateModified);
-                            $('#Exercises').val(dataRef.parent().child('Exercises').numChildren());
-
-
-                        }
-
-                    });
-
-
-                });
-            }
-
-        });
-    }
+ 
 
