@@ -32,7 +32,7 @@ namespace JDT.Controllers
         }
 
 
-        public ViewResult Search(string id)
+        public ViewResult Search()
         {
             return View();
         }

@@ -1,5 +1,7 @@
 ﻿var fbUsers = new Firebase("https://jdt.firebaseio.com/Users/");
 var jdtRef = new Firebase('https://jdt.firebaseio.com');
+
+var lockerRef = new Firebase('https://jdt.firebaseio.com/Lockers/');
 var auth;
 
 function LogOut()
@@ -8,10 +10,21 @@ function LogOut()
         auth.unauth();
 }
 
+function getTodaysDate() {
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+    var output = d.getFullYear() + '/' +
+        (month < 10 ? '0' : '') + month + '/' +
+        (day < 10 ? '0' : '') + day;
+
+    return output;
+}
+
 function initializeSimpleLogin(callback)
 {
     try {
-        console.log('initializeSimpleLogin()');
+        //console.log('initializeSimpleLogin()');
         auth = new FirebaseSimpleLogin(jdtRef, function (error, user) {
             if (error) {
                 switch (error.code) {
@@ -28,13 +41,13 @@ function initializeSimpleLogin(callback)
             } else if (user) {
                 // user authenticated with Firebase
                 //email = user.email;
-                console.log('User is authorized: User ID: ' + user.id + ', Email: ' + user.email + ', Provider: ' + user.provider);
+                //console.log('User is authorized: User ID: ' + user.id + ', Email: ' + user.email + ', Provider: ' + user.provider);
 
                 callback(user.email);
 
 
             } else {
-                console.log('invalid uid/pwd');
+                //console.log('invalid uid/pwd');
                 callback(null);
             }
 
@@ -61,18 +74,68 @@ function getUserIdByEmail(emailAddress, callback) {
 /**
  * Creates a new user record and also updates the index
  */
-function createNewUser(userRecord) {
-    console.log('createNewUser' + userRecord);
-    var id = 0;
+function createNewUser(userRecord,email, password, callback) {
+    //console.log('createNewUser ' + email + ' '  + password);
+    
+    var userEmail = email;
+    var userPwd = password;
     try {
-    id = fbUsers.child('user').push(userRecord).name();
-    fbUsers.child('emails_to_ids/' + emailToKey(userRecord.Email)).set(id);
+        //console.log('fbUsers Path ' + fbUsers.toString());
+        //console.log('userRecord ' + JSON.stringify(userRecord));
+        var uid = fbUsers.child('user').push(userRecord, function (err) {
+
+            if (!err) {
+                //console.log('fbUsers Path ' + fbUsers.toString());
+                fbUsers.child('emails_to_ids/' + emailToKey(userRecord.Email)).set(uid, function (err) {
+                    if (!err) {
+                        //console.log('createNewUser ' + userEmail + ' ' + userPwd);
+                        auth.login('password', {
+                            email: userEmail,
+                            password: userPwd
+                        });
+                        callback(uid);
+                        
+                    }
+                });
+            }
+
+
+        }).name();
+            
+        
+        
+    
     }
     catch(e)
     {
         console.log(e);
     }
-    return id;
+    
+}
+
+function createLocker(uid) {
+    //console.log('uid ' + uid);
+    var userLockerRef = fbUsers.child('user/' + uid);
+    try {
+
+        var obj = {
+            "DateCreated": getTodaysDate(),
+            "DateModified": getTodaysDate(),
+            "Name": "Your Locker Name",
+        };
+        var id = lockerRef.push(obj,function (err) {
+            if (!err) {
+                obj = { "LockerId": id };
+                userLockerRef.update(obj);
+            }
+
+        }).name();
+
+
+    } catch (e) {
+
+        console.log('An error occured ' + JSON.stringify(e));
+    }
 }
 
 /**

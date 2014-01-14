@@ -1,12 +1,14 @@
 ﻿
 var editor;
 var oTable;
+var userLockersRef;
 var pathname = window.location.pathname.split("/");
 var planName = pathname[pathname.length - 1];
 var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
 var workOutsRef = new Firebase('https://jdt.firebaseio.com/WorkOuts/');
 var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
 var planWorkOutsRef = plansRef.child(planName + '/WorkOuts/');
+var lockersRef = new Firebase('https://jdt.firebaseio.com/Lockers/');
 var userPlansRef;
 var records = [];
 var columns;
@@ -54,7 +56,8 @@ function populateList(email) {
         var obj = {};
         columns = [
 		{ mData: "Name", sTitle: "Name" },
-        { mData: "Description", sTitle: "Description", sClass:"hidden-xs" },
+        { mData: "Description", sTitle: "Description", sClass: "hidden-xs" },
+        //{ mData: "CreatedByUserName", sTitle: "Created By"},
         { mData: "DateCreated", sTitle: "Date Created", sClass:"hidden-xs" },
         {
             sDefaultContent: "0",
@@ -105,6 +108,10 @@ function populateList(email) {
                     initializeAuth(function (email) {
                         if (email) {
                             getUserIdByEmail(email, function (uid) {
+                                userRef.child(uid).once('value', function (snapShot) {
+                                var lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/');
+
+                                
                                 var name = data.data.Name;
                                 var description = data.data.Description;
                                 userPlansRef = userRef.child(uid).child('Plans');
@@ -114,8 +121,8 @@ function populateList(email) {
                                 obj.DateCreated = getTodaysDate();
                                 obj.DateModified = getTodaysDate();
                                 obj.CreatedBy = uid;
-                                
-                                console.log('userPlansRef Url ' + userPlansRef.child(planName).toString());
+                                obj.CreatedByUserName = snapShot.val().UserName;
+                                //console.log('userPlansRef Url ' + userPlansRef.child(planName).toString());
                                 
                                 planWorkOutsRef.off('child_changed', planWorkOutsChanged);
                                 //userPlansRef.child(planName).off('child_changed');
@@ -126,7 +133,7 @@ function populateList(email) {
                                         planWorkOutsRef.child(id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
                                             if (!err) {
                                                 
-                                                userPlansRef.child(planName).set(Firebase.ServerValue.TIMESTAMP);
+                                                lockerPlansRef.child(planName).set(Firebase.ServerValue.TIMESTAMP);
                                                 planWorkOutsRef.on('child_changed', planWorkOutsChanged);
                                                 successCallback({ "id": id });
                                                 
@@ -137,7 +144,7 @@ function populateList(email) {
                                 }).name();
 
 
-
+                                });
                             });
                         }
 
@@ -253,7 +260,7 @@ var planWorkOutsAdded = function (snapShot) {
         var o = childSnapShot.val();
         //console.log
         o.DT_RowId = childSnapShot.name();
-
+        
         records.push(o);
 
         initializeDataTable();

@@ -3,7 +3,8 @@ var oTable;
 var pathname = window.location.pathname.split("/");
 var planName = pathname[pathname.length - 2];
 var workOutName = pathname[pathname.length - 1];
-var workOutExercisesRef = new Firebase('https://jdt.firebaseio.com/WorkOuts/' + workOutName + '/Exercises/');
+var exercisesRef = new Firebase('https://jdt.firebaseio.com/Exercises/');
+var workOutExercises = new Firebase('https://jdt.firebaseio.com/WorkOuts/' + workOutName + '/Exercises/');
 var records = [];
 var columns;
 
@@ -137,10 +138,11 @@ function populateList(email) {
 
             var id = null;
             var obj = {};
+            
             if (data.action === 'create') {
                 initializeAuth(function (email) {
                     if (email) {
-
+                      
                             obj.Name = data.data.Name;
                             obj.Description = data.data.Description;
                             obj.DateCreated = getTodaysDate();
@@ -150,18 +152,34 @@ function populateList(email) {
                             obj.RecMinReps = data.data.RecMinReps;
                             obj.RecMaxReps = data.data.RecMaxReps;
                             obj.RecDuration = data.data.RecDuration;
-                        try {
-                            workOutExercisesRef.off('value', workOutExercisesChanged);
-                            id = workOutExercisesRef.push(obj, function (err) {
-                                
-                                    workOutExercisesRef.on('value', workOutExercisesChanged);
-                                    successCallback({ "id": id });
-                                
+                            try {
+                            workOutExercises.off('child_changed', workOutsExercisesChanged);
+                            id = exercisesRef.push(obj, function (err) {
+                                if (!err) {
+                                    
+                                    
+                                            //console.log(workOutExercises.parent().toString());
+                                            //workOutExercises.parent().set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                                                workOutExercises.child(id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                                                    if (!err)
+                                                    {
+                                                        workOutExercises.on('child_changed', workOutsExercisesChanged);
+                                                        successCallback({ "id": id });
+                                                    }
+                                                });
+                                                
+                                          
+                                        
+                                    
+                                    
+                                }
 
                             }).name();
-                        } catch (e) {
-                            workOutExercisesRef.on('value', workOutExercisesChanged);
-                        }
+
+                            } catch (e) {
+                            workOutExercisesRef.on('child_changed', workOutsExercisesChanged);
+                            }
+                        
                     }
                 });
 
@@ -180,15 +198,21 @@ function populateList(email) {
                         obj.RecDuration = data.data.RecDuration;
 
                     try {
-                        workOutExercisesRef.off('value', workOutExercisesChanged);
-                        workOutExercisesRef.child(id).update(obj, function (err) {
-                     
-                                workOutExercisesRef.on('value', workOutExercisesChanged);
-                                successCallback({ "id": id });
+                        console.log(exercisesRef.child(id).toString());
+                        workOutExercises.off('child_changed', workOutsExercisesChanged);
+                        exercisesRef.child(id).update(obj, function (err) {
+                            console.log('test');
+                            workOutExercises.child(id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                                if (!err) {
+                                    workOutExercises.on('child_changed', workOutsExercisesChanged);
+                                    successCallback({ "id": id });
+                                }
+                            });
+                            
                         
                         });
                     } catch (e) {
-                        workOutExercisesRef.on('value', workOutExercisesChanged);
+                        workOutExercises.off('child_changed', workOutsExercisesChanged);
                             console.log(JSON.stringify(e));
                         }
                     
@@ -200,15 +224,20 @@ function populateList(email) {
                 initializeAuth(function (email) {
                     try {
                         var r = [];
-                        workOutExercisesRef.off('child_removed', workOutExercisesRefRemoved);
-                        workOutExercisesRef.child(data.data[0]).remove(function () {
-                            r = jQuery.removeFromArray(data.data[0], records);
-                            records = r;
-                            workOutExercisesRef.on('child_removed', workOutExercisesRefRemoved);
-                            successCallback({ "id": id });
+                        workOutExercises.off('child_removed', workOutsExercisesRemoved);
+                        exercisesRef.child(data.data[0]).remove(function () {
+                            workOutExercises.child(data.data[0]).remove(function (err) {
+                                if (!err) {
+                                    r = jQuery.removeFromArray(data.data[0], records);
+                                    records = r;
+                                    workOutExercises.on('child_removed', workOutsExercisesRemoved);
+                                    successCallback({ "id": id });
+                                }
+                            });
+                           
                         });
                     } catch (e) {
-                        workOutExercisesRef.on('child_removed', workOutExercisesRefRemoved);
+                        workOutExercises.on('child_removed', workOutExercisesRefRemoved);
                     }
  
                 })
@@ -240,20 +269,20 @@ function populateList(email) {
 
         initializeDataTable();
 
-        workOutExercisesRef.on('child_added', workOutExercisesAdded);
+        workOutExercises.on('child_added', workOutsExercisesAdded);
 
-        workOutExercisesRef.on('child_changed', workOutExercisesChanged);
+        workOutExercises.on('child_changed', workOutsExercisesChanged);
 
-        workOutExercisesRef.on('child_removed', workOutExercisesRefRemoved);
+        workOutExercises.on('child_removed', workOutsExercisesRemoved);
 
     });
 
     }
 
 
-var workOutExercisesAdded = function (snapShot) {
-
-    workOutExercisesRef.child(snapShot.name()).once("value", function (childSnapShot) {
+var workOutsExercisesAdded = function (snapShot) {
+    console.log('added');
+    exercisesRef.child(snapShot.name()).once("value", function (childSnapShot) {
 
         var o = childSnapShot.val();
         o.DT_RowId = childSnapShot.name();
@@ -265,11 +294,11 @@ var workOutExercisesAdded = function (snapShot) {
     });
 }
 
-var workOutExercisesChanged = function (snapShot) {
-    //console.log('changed');
+var workOutsExercisesChanged = function (snapShot) {
+    console.log('changed');
     
 
-    workOutExercisesRef.child(snapShot.name()).on("value", function (childSnapShot) {
+    exercisesRef.child(snapShot.name()).on("value", function (childSnapShot) {
         //console.log('plan changed ' + JSON.stringify(childSnapShot.val()));
         //console.log('record length ' + records.length);
         var o = childSnapShot.val();
@@ -293,12 +322,12 @@ var workOutExercisesChanged = function (snapShot) {
 
 }
 
-var workOutExercisesRefRemoved = function (snapShot) {
+var workOutsExercisesRemoved = function (snapShot) {
     //console.log('record length before ' + records.length);
     var r = [];
 
 
-    workOutExercisesRef.child(snapShot.name()).on("value", function (childSnapShot) {
+    exercisesRef.child(snapShot.name()).on("value", function (childSnapShot) {
         //console.log('value ' + childSnapShot.name());
 
         r = jQuery.removeFromArray(childSnapShot.name(), records);

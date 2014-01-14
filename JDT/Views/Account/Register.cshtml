@@ -85,29 +85,35 @@
         $("#Register").submit(function (event) {
             
             event.preventDefault();
-            
+            var userId = null;
             initializeSimpleLogin(function (email) {
                 if (email){
                     // user authenticated with Firebase
-                    console.log('User ID: ' + user.id + ', Email: ' + user.email + ', Provider: ' + user.provider);
+                    //console.log('User ID: ' + user.id + ', Email: ' + user.email + ', Provider: ' + user.provider);
                     window.location.replace("../Dashboard");
 
                 } else {
                     //console.log('invalid uid/pwd');
                     auth.createUser($("#Email").val(), $("#Password").val(), function (error, user) {
                         if (!error) {
-                            var user = createUserObject();
-                            window.location.replace("../Dashboard");
+                            createUserObject(function (userName) {
+                                //console.log('userId ' + userName);
+                                createLocker(userName);
+                            });
+                            
                         }
                         else {
                             // an error occurred while attempting login
                             console.log('error' + error);
                             switch (error.code) {
                                 case 'INVALID_EMAIL':
+                                    alert(error.code);
                                     console.log(error.code);
                                 case 'INVALID_PASSWORD':
+                                    alert(error.code);
                                     console.log(error.code);
                                 default:
+                                    alert(error.code);
                                     console.log(error.code);
                             }
                             return;
@@ -125,24 +131,43 @@
             
         });
         
+        function getTodaysDate() {
+            var d = new Date();
+            var month = d.getMonth() + 1;
+            var day = d.getDate();
+            var output = d.getFullYear() + '/' +
+                (month < 10 ? '0' : '') + month + '/' +
+                (day < 10 ? '0' : '') + day;
 
-        function createUserObject() {
-            console.log('createUserObject');
-            //var fb = new Firebase("https://jdt.firebaseio.com/Users/");
+            return output;
+        }
+
+        function createUserObject(callback) {
+            //console.log('createUserObject');
+
             var userName = $("#UserName").val();
             var firstName = $("#FirstName").val();
             var lastName = $("#LastName").val();
             var email = $("#Email").val();
+            var password = $("#Password").val();
+            
             try {
-                createNewUser({
+               createNewUser({
                     "UserName": userName,
                     "Name": {
                         "First": firstName,
                         "Last": lastName
                     },
-                    "Email": email
+                    "Email": email,
+                    "DateCreated": getTodaysDate(),
+                   "DateModified": getTodaysDate(),
 
-                });
+               }, email, password, function (uid) {
+                   //console.log('uid: ' + uid);
+                   callback(uid);
+               });
+               
+               
             }
             catch (e) {
                 console.log(e);

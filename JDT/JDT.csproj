@@ -185,6 +185,7 @@
     <Content Include="Content\css\dataTables.bootstrap.css" />
     <Content Include="Content\css\dataTables.editor.css" />
     <Content Include="Content\css\TableTools.css" />
+    <Content Include="Content\js\CrudOps\Anoym\WorkOuts.js" />
     <Content Include="Content\js\libs\dataTables.bootstrap.js" />
     <Content Include="Content\js\libs\dataTables.editor.bootstrap.js" />
     <Content Include="Content\js\libs\dataTables.editor.js" />
@@ -326,12 +327,12 @@
     <Content Include="Content\js\app.js" />
     <Content Include="Content\js\calendar.js" />
     <Content Include="Content\js\chat.js" />
-    <Content Include="Content\js\CrudOps\Diets.js" />
-    <Content Include="Content\js\CrudOps\Exercises.js" />
-    <Content Include="Content\js\CrudOps\Ingredients.js" />
-    <Content Include="Content\js\CrudOps\Plans.js" />
-    <Content Include="Content\js\CrudOps\Recipes.js" />
-    <Content Include="Content\js\CrudOps\WorkOuts.js" />
+    <Content Include="Content\js\CrudOps\Acct\Diets.js" />
+    <Content Include="Content\js\CrudOps\Acct\Exercises.js" />
+    <Content Include="Content\js\CrudOps\Acct\Ingredients.js" />
+    <Content Include="Content\js\CrudOps\Acct\Plans.js" />
+    <Content Include="Content\js\CrudOps\Acct\Recipes.js" />
+    <Content Include="Content\js\CrudOps\Acct\WorkOuts.js" />
     <Content Include="Content\js\fileupload.js" />
     <Content Include="Content\js\fireBaseAuth.js" />
     <Content Include="Content\js\forms-elemets.js" />
@@ -553,18 +554,8 @@
     <Content Include="Content\js\libs\parsley\parsley-license.md" />
     <Content Include="Views\Shared\_NavHeaderPartial.cshtml" />
     <Content Include="Views\Shared\_NavSidePartial.cshtml" />
-    <Content Include="Views\Plans\Create.cshtml" />
-    <Content Include="Views\Plans\Edit.cshtml" />
-    <Content Include="Views\Plans\Delete.cshtml" />
-    <Content Include="Views\Plans\Details.cshtml" />
     <Content Include="Views\Plans\Index.cshtml" />
-    <Content Include="Views\Plans\_CreateOrEdit.cshtml" />
-    <Content Include="Views\WorkOuts\Create.cshtml" />
-    <Content Include="Views\WorkOuts\Edit.cshtml" />
-    <Content Include="Views\WorkOuts\Delete.cshtml" />
-    <Content Include="Views\WorkOuts\Details.cshtml" />
     <Content Include="Views\WorkOuts\Index.cshtml" />
-    <Content Include="Views\WorkOuts\_CreateOrEdit.cshtml" />
     <Content Include="Views\Exercises\Create.cshtml" />
     <Content Include="Views\Exercises\Edit.cshtml" />
     <Content Include="Views\Exercises\Delete.cshtml" />
@@ -612,9 +603,9 @@
     <Content Include="Views\InvitedUsers\Details.cshtml" />
     <Content Include="Views\InvitedUsers\Index.cshtml" />
     <Content Include="Views\InvitedUsers\_CreateOrEdit.cshtml" />
-    <Content Include="Views\WorkOuts\Search.cshtml" />
     <Content Include="Views\Shared\_LayoutUnAuth.cshtml" />
     <Content Include="Views\Account\LogOff.cshtml" />
+    <Content Include="Views\WorkOuts\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

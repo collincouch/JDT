@@ -1,9 +1,13 @@
 ﻿
 var editor;
 var oTable;
-var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
-var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
 var userPlansRef;
+var userLockerRef;
+var root = new Firebase('https://jdt.firebaseio.com');
+var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
+var lockersRef = new Firebase('https://jdt.firebaseio.com/Lockers/');
+var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
+
 var records = [];
 var columns;
 
@@ -108,48 +112,36 @@ function populateList(email) {
                 },
             "ajax": function (method, url, data, successCallback, errorCallback) {
 
-               
+                
                 if (data.action === 'create') {
-                    //userPlansRef.off('child_changed', usersPlansChanged);
+
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
-                            
-                            //var fb = new Firebase('https://jdt.firebaseio.com/Plans/');
-                            //var fbUser = new Firebase('https://jdt.firebaseio.com/Users/user/' + uid + '/Plans/');
-                            userPlansRef = userRef.child(uid).child('Plans');
+                            userRef.child(uid).once('value', function (snapShot) {
 
-                            var name = data.data.Name;
+                                var lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/');
 
-                            var description = data.data.Description;
-                            
-                            obj.Name = name;
-                            obj.Description = description;
-                            obj.DateModified = getTodaysDate();
-                            obj.DateCreated = getTodaysDate();
-                            //console.log('asdfasdf');
-                            try {
-
-                                userPlansRef.off('child_changed', usersPlansChanged);
-                                id = plansRef.push(obj, function (err) {
-                                    if (!err) {
-                                        //console.log('id ' + id);
-                                            userPlansRef.child(id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                                    var name = data.data.Name;
+                                    var description = data.data.Description;
+                                    obj.Name = name;
+                                    obj.Description = description;
+                                    obj.DateModified = getTodaysDate();
+                                    obj.DateCreated = getTodaysDate();
+                                    lockerPlansRef.off('child_changed', lockersPlansChanged);
+                                    var planId = plansRef.push(obj, function (err) {
+                                        if (!err) {
+                                            lockerPlansRef.child(planId).set(Firebase.ServerValue.TIMESTAMP, function (err) {
                                                 if (!err) {
-                                                    
-                                                    userPlansRef.on('child_changed', usersPlansChanged);
-                                                    successCallback({ "id": id });
+                                                    lockerPlansRef.on('child_changed', lockersPlansChanged);
+                                                    successCallback({ "id": planId });
                                                 }
-                                            });
-                                    }
-                                    
-                                }).name();
-                               
 
-                            } catch (e) {
-                                userPlansRef.on('child_changed', usersPlansChanged);
-                                console.log('An error occured ' + JSON.stringify(e));
-                            }
-                            
+                                            })
+                                        }
+
+                                   }).name();
+
+                            })           
                             
                         });
                     });
@@ -159,44 +151,50 @@ function populateList(email) {
                     id = data.id;
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
-                            
-                            userPlansRef = userRef.child(uid + '/Plans/' + id);
-                            var name = data.data.Name;
-                            var description = data.data.Description;
-                            obj.Name = name;
-                            obj.Description = description;
-                            obj.DateModified = getTodaysDate();
-                            
-                            try {
-                                userPlansRef.parent().off('child_changed', usersPlansChanged);
-                                //console.log('userPlansRef.parent() is ' + userPlansRef.parent().toString());
-                                plansRef.child(id).update(obj, function (err) {
-                                    if (!err) {
-                                        //console.log('setting ' + err);
-                                        userPlansRef.set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                            userRef.child(uid).once('value', function (snapShot) {
 
-                                            userPlansRef.parent().on('child_changed', usersPlansChanged);
+                                var lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/' + id);
+                                var name = data.data.Name;
+                                var description = data.data.Description;
+                                obj.Name = name;
+                                obj.Description = description;
+                                obj.DateModified = getTodaysDate();
+
+                                try {
+                                    lockerPlansRef.parent().off('child_changed', lockersPlansChanged);
+                                    //console.log('userPlansRef.parent() is ' + userPlansRef.parent().toString());
+                                    plansRef.child(id).update(obj, function (err) {
+                                        if (!err) {
+                                            //console.log('setting ' + err);
+                                            lockerPlansRef.set(Firebase.ServerValue.TIMESTAMP, function (err) {
+
+                                                lockerPlansRef.parent().on('child_changed', lockersPlansChanged);
+                                                successCallback({ "id": id });
+
+
+
+                                            });
+
+                                        }
+                                        else {
+                                            lockerPlansRef.parent().on('child_changed', lockersPlansChanged);
+                                            console.log('error occured editing plans ');
                                             successCallback({ "id": id });
-                                           
-                                            
+                                        }
 
-                                        });
 
-                                    }
-                                    else {
-                                        userPlansRef.parent().on('child_changed', usersPlansChanged);
-                                        console.log('error occured editing plans ');
-                                        successCallback({ "id": id });
-                                    }
+                                    });
 
-                                    
-                                });
-                                
-                                
-                            } catch (e) {
-                                userPlansRef.parent().on('child_changed', usersPlansChanged);
-                                console.log('an error ocured ' + JSON.stringify(e));
-                            }
+
+                                } catch (e) {
+                                    lockerPlansRef.parent().on('child_changed', lockersPlansChanged);
+                                    console.log('an error ocured ' + JSON.stringify(e));
+                                }
+
+                            });
+
+                           
+                           
                             
                             
                         });
@@ -209,22 +207,27 @@ function populateList(email) {
                     
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
-                                  userPlansRef = userRef.child(uid + '/Plans/' + data.data[0]);
-                            var r = [];
-                    userPlansRef.parent().off('child_removed', usersPlansRemoved);
-                    plansRef.child(data.data[0]).remove(function (err) {
-                        if (!err) {
-                            userPlansRef.remove(function (err) {
-                                if (!err) {
-                                    r = jQuery.removeFromArray(data.data[0], records);
-                                    records = r;
-                                    userPlansRef.parent().on('child_removed', usersPlansRemoved);
-                                    successCallback({ "id": null });
-                                }
-                            });
-                        }
+                            userRef.child(uid).once('value', function (snapShot) {
 
-                    });
+                                var lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/');
+                                var r = [];
+                                lockerPlansRef.parent().off('child_removed', lockersPlansRemoved);
+                                plansRef.child(data.data[0]).remove(function (err) {
+                                    if (!err) {
+                                        lockerPlansRef.child(data.data[0]).remove(function (err) {
+                                            if (!err) {
+                                                r = jQuery.removeFromArray(data.data[0], records);
+                                                records = r;
+                                                lockerPlansRef.parent().on('child_removed', lockersPlansRemoved);
+                                                successCallback({ "id": null });
+                                            }
+                                        });
+                                    }
+
+                                });
+
+                            });
+                           
                    
 
                         })
@@ -261,13 +264,18 @@ function populateList(email) {
         getUserIdByEmail(email, function (uid) {
           
             initializeDataTable();
-            userPlansRef = userRef.child(uid + '/Plans/');
-            
-            userPlansRef.on('child_added', usersPlansAdded);
-           
-            userPlansRef.on('child_changed', usersPlansChanged);
+            userRef.child(uid).once('value', function (snapShot) {
 
-            userPlansRef.on('child_removed', usersPlansRemoved);
+                lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/');
+
+                //userPlansRef = userRef.child(uid + '/Plans/');
+
+                lockerPlansRef.on('child_added', lockersPlansAdded);
+
+                lockerPlansRef.on('child_changed', lockersPlansChanged);
+
+                lockerPlansRef.on('child_removed', lockersPlansRemoved);
+            });
 
         });
 
@@ -276,8 +284,8 @@ function populateList(email) {
 
 
 
-var usersPlansAdded = function (snapShot) {
-    console.log('usersPlansAdded executing');
+var lockersPlansAdded = function (snapShot) {
+    console.log('lockersPlansAdded executing');
     plansRef.child(snapShot.name()).once("value", function (childSnapShot) {
 
         var o = childSnapShot.val();
@@ -292,7 +300,7 @@ var usersPlansAdded = function (snapShot) {
 
 
 
-var usersPlansChanged = function (snapShot) {
+var lockersPlansChanged = function (snapShot) {
     console.log('changed');
     
     
@@ -320,7 +328,7 @@ var usersPlansChanged = function (snapShot) {
 
 }
 
-var usersPlansRemoved = function (snapShot) {
+var lockersPlansRemoved = function (snapShot) {
    //console.log('record length before ' + records.length);
    var r = [];
     
