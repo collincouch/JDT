@@ -1,71 +1,132 @@
-﻿<script>
-    function setSideNav(authEmail) {
-        if (authEmail) {
-            $('#side-nav').append("<li class=\"@ViewBag.IsDashboardActive\">"
-                + "<a href=\"@Url.Action("Index","Dashboard")\">"
-                            + "<i class=\"fa fa-home\"></i>"
-                            + "<span class=\"name\">Dashboard</span>"
-                + "</a>"
-                + "</li>"
-                + "<li class=\"panel @ViewBag.IsManagePlansActive\">"
-                + "<a href=\"@Url.Action("Index","Plans")\">"
-                + "<i class=\"fa fa-edit\"></i>"
-                + "<span class=\"name\">Plans</span></a>"
-                + "</li>"
-                + "</li>"
-                + "<li class=\"panel @ViewBag.IsManagePlansActive\">"
-                + "<a href=\"@Url.Action("Search","WorkOuts")\">"
-                + "<i class=\"fa fa-edit\"></i>"
-                + "<span class=\"name\">Workouts</span></a>"
-                + "</li>"
-                + "<li class=\"panel\">"
-                + "<a href=\"@Url.Action("Index","InvitedUsers")\">"
-                + "<i class=\"fa fa-group\"></i>"
-                + "<span class=\"name\">Friends</span>"
-                + "</a>"
-                + "</li>"
-                + "<li class=\"visible-xs\">"
-                + "<a href=\"#\" id=\"logOutSidNav\">"
-                + "<i class=\"fa fa-sign-out\"></i>"
-                + "<span class=\"name\">Sign Out</span>"
-                + "</a>"
-                + "</li>");
+﻿
+
+<script>
+        function setSideNav(authEmail) {
+            if (authEmail) {
+                $('.auth').toggle(true);
+                $('.unauth').toggle(false);
+                @*$('#side-nav').append("<li class=\"@ViewBag.IsDashboardActive\">"
+                    + "<a href=\"@Url.Action("Index","Dashboard")\">"
+                                + "<i class=\"fa fa-home\"></i>"
+                                + "<span class=\"name\">Dashboard</span>"
+                    + "</a>"
+                    + "<li class\"panel\">"
+                     + "<a class=\"accordion-toggle\" data-parent=\"#side-nav\" href=\"#forms-collapse\">"
+                     + "<i class=\"fa fa-edit\"></i>"
+                     + "<span class=\"name\">My Locker</span>"
+                     + "</a>"
+                      + "<ul id=\"forms-collapse\" class=\"panel-collapse\">"
+                    + "<li>"
+                    + "<a href=\"@Url.Action("Index","Plans")\">"
+                     + "My Content"
+                     + "</a>"
+                    + "</li>"
+                    + "<a href=\"#\">"
+                     + "My Workouts"
+                     + "</a>"
+                    + "</li>"
+                    + "</ul>"
+                    + "</li>"
+                    + "<li class=\"panel\">"
+                    + "<a href=\"@Url.Action("Index","InvitedUsers")\">"
+                    + "<i class=\"fa fa-group\"></i>"
+                    + "<span class=\"name\">Friends</span>"
+                    + "</a>"
+                    + "</li>"
+                    + "<li class=\"visible-xs\">"
+                    + "<a href=\"#\" id=\"logOutSidNav\">"
+                    + "<i class=\"fa fa-sign-out\"></i>"
+                    + "<span class=\"name\">Sign Out</span>"
+                    + "</a>"
+                    + "</li>");*@
+            }
+            else {
+                $('.auth').toggle(false);
+                $('.unauth').toggle(true);
+                @*$('#side-nav').append("<li class=\"visible-xs\">"
+                    + "<a href=\"@Url.Action("Login","Account")\">"
+                    + "<i class=\"fa fa-sign-in\"></i>"
+                    + "<span class=\"name\">Sign In</span>"
+                    + "</a>"
+                    + "</li>"
+                    + "<li class=\"visible-xs\">"
+                    + "<a href=\"@Url.Action("Register","Account")\">"
+                    + "<i class=\"fa fa-random\"></i>"
+                    + "<span class=\"name\">Register</span>"
+                    + "</a>"
+                    + "</li>"
+                    + "<li class=\"panel\">"
+                    + "<a href=\"@Url.Action("Index","Home")\">"
+                    + "<i class=\"fa fa-home\"></i>"
+                    + "<span class=\"name\">Home</span>"
+                    + "</a>"
+                    + "</li>"
+                    + "<li class=\"panel\">"
+                    + "<a href=\"@Url.Action("AboutUs","Home")\">"
+                    + "<i class=\"fa fa-info\"></i>"
+                    + "<span class=\"name\">About Us</span>"
+                    + "</a>"
+                    + "</li>"
+                    + "<li class=\"panel\">"
+                    + "<a href=\"@Url.Action("ContactUs","Home")\">"
+                    + "<i class=\"fa fa-phone\"></i>"
+                    + "<span class=\"name\">Contact Us</span>"
+                    + "</a>"
+                    + "</li>");*@
+
+            }
         }
-        else {
-            $('#side-nav').append("<li class=\"visible-xs\">"
-                + "<a href=\"@Url.Action("Login","Account")\">"
-                + "<i class=\"fa fa-sign-in\"></i>"
-                + "<span class=\"name\">Sign In</span>"
-                + "</a>"
-                + "</li>"
-                + "<li class=\"visible-xs\">"
-                + "<a href=\"@Url.Action("Register","Account")\">"
-                + "<i class=\"fa fa-random\"></i>"
-                + "<span class=\"name\">Register</span>"
-                + "</a>"
-                + "</li>"
-                + "<li class=\"panel\">"
-                + "<a href=\"@Url.Action("Index","Home")\">"
-                + "<i class=\"fa fa-home\"></i>"
-                + "<span class=\"name\">Home</span>"
-                + "</a>"
-                + "</li>"
-                + "<li class=\"panel\">"
-                + "<a href=\"@Url.Action("AboutUs","Home")\">"
-                + "<i class=\"fa fa-info\"></i>"
-                + "<span class=\"name\">About Us</span>"
-                + "</a>"
-                + "</li>"
-                + "<li class=\"panel\">"
-                + "<a href=\"@Url.Action("ContactUs","Home")\">"
-                + "<i class=\"fa fa-phone\"></i>" 
-                + "<span class=\"name\">Contact Us</span>"
-                + "</a>"
-                + "</li>");
-
-        }
-    }
-</script>
+    </script>
 
 
+<ul id="side-nav" class="side-nav sidebar-icons auth">
+    <li>
+        <a href="@Url.Action("Index","Dashboard")">
+            <i class="fa fa-home"></i>
+            <span class="name">Dashboard</span>
+        </a>
+    </li>
+    <li class="panel">
+        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#side-nav" href="#forms-collapse">
+            <i class="eicon-doc"></i>
+            <span class="name">My Locker</span>
+        </a>
+        <ul id="forms-collapse" class="panel-collapse collapse" style="height: 0px;">
+            <li><a href="@Url.Action("Index","Plans")">Create a Fitness Plan</a></li>
+            <li><a href="@Url.Action("Index","Locker")">Just Do This</a></li>
+        </ul>
+    </li>
+    <li>
+        <a href="@Url.Action("Search","WorkOuts")">
+            <i class="fa fa-search"></i>
+            <span class="name">Find Workouts</span>
+        </a>
+    </li>
+    <li class="visible-xs">
+        <a href="#" id="logOut">
+            <i class="fa fa-sign-out"></i>
+            <span class="name">Sign out</span>
+        </a>
+    </li>
+</ul>
 
+<ul id="side-nav" class="side-nav sidebar-icons unauth">
+    <li class="visible-xs">
+        <a href="@Url.Action("Index","Home")">
+            <i class="fa fa-home"></i>
+            <span class="name">Home</span>
+        </a>
+    </li>
+    <li class="visible-xs">
+        <a href="@Url.Action("Login","Account")">
+            <i class="fa fa-sign-in"></i>
+            <span class="name">Sign In</span>
+        </a>
+    </li>
+    <li class="visible-xs">
+        <a href="@Url.Action("Register","Account")">
+            <i class="eicon-user-add"></i>
+            <span class="name">Register</span>
+        </a>
+    </li>
+</ul>

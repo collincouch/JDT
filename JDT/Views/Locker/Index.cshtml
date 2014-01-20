@@ -1,0 +1,45 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Just Do This<small>View the workouts you registered for and launch them from here</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10">
+            <section class="widget">
+                <header>
+                    <h5>
+                        <i class="fa fa-check-square-o"></i>
+                        Registered Workouts
+                    </h5>
+                </header>
+                <div class="body">
+                    <div class="panel-group" id="accordion3">
+                        
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/dashboard/jqueryplugins")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/site")
+    @Scripts.Render("~/Content/js/CrudOps/Acct/Locker/WorkOuts.js")
+    @Scripts.Render("~/bundles/jqueryplugins")
+
+    <script>
+        $(document).ready(function () {
+            initListAuth();
+        });
+
+    </script>
+}
+
+
