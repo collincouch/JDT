@@ -35,7 +35,16 @@ function countProperties(obj) {
     return propCount;
 }
 
+function getTodaysDate() {
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+    var output = d.getFullYear() + '/' +
+        (month < 10 ? '0' : '') + month + '/' +
+        (day < 10 ? '0' : '') + day;
 
+    return output;
+}
 
 
 function populateList(email) {
@@ -164,11 +173,15 @@ function initializeDataTable() {
         var workOutId = arr[1];
         console.log(uid);
         userRef.child(uid).once('value', function (snapShot) {
+            var o ={};
+            o.DateCreated=getTodaysDate();
+            o.DateModified=getTodaysDate();
+            o.Status="New";
 
             var lockerRegisteredWorkOutRef = lockersRef.child(snapShot.val().LockerId + '/JustDoThis/WorkOuts/');
             try {
 
-                lockerRegisteredWorkOutRef.child(workOutId).set(Firebase.ServerValue.TIMESTAMP);
+                lockerRegisteredWorkOutRef.child(workOutId).set(o);
 
             } catch (e) {
 
