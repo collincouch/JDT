@@ -16,5 +16,10 @@ namespace JDT.Controllers
             return View();
         }
 
+        public ActionResult JustDoItWK(string id)
+        {
+            return View();
+        }
+
     }
 }

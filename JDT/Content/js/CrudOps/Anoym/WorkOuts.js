@@ -75,7 +75,7 @@ function populateList(email) {
                 return returnVal;
             },
             "aTargets": [5]
-        }
+        },
     ];
 
     getUserIdByEmail(email, function (uid) {
@@ -191,7 +191,9 @@ function initializeDataTable() {
 
         userRef.child(uid).once('value', function (snapShot) {
             
-            o.DateCreated=getTodaysDate();
+            if(o.Status.toUpperCase()=="NEW")
+                o.DateCreated = getTodaysDate();
+
             o.DateModified = getTodaysDate();
             
            

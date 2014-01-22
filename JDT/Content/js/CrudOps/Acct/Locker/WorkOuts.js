@@ -242,7 +242,9 @@ function updateWorkOutStatus(action,workOutId) {
                 }
 
                 lockerWorkOutRef.update(o, function () {
-                    //alert('complete');
+                    console.log('status: ' + o.Status.toUpperCase());
+                    if (o.Status.toUpperCase() == "ACTIVE")
+                        lockersRef.child(snapShot.val().LockerId + "/Active/").child(workOutId).set(Firebase.ServerValue.TIMESTAMP);
                 });
             });
 
@@ -277,7 +279,7 @@ function renderStatusButton(workOutName, currentStatus) {
             break;
     }
 
-    s = "<a id=\"bdg_" + workOutName + "\" data-action=\"" + action + "\" href=\"#\">"
+    s = "<a id=\"bdg_" + workOutName + "\" data-action=\"" + action + "\" href=\"/Locker/JustDoItWK/" + workOutName + "\">"
         + "<span class=\"" + cssStyle + "\" id=\"status_" + workOutName + "\">" + text + "</span>"
         + "</a>";
 

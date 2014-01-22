@@ -185,6 +185,7 @@
     <Content Include="Content\css\dataTables.bootstrap.css" />
     <Content Include="Content\css\dataTables.editor.css" />
     <Content Include="Content\css\TableTools.css" />
+    <Content Include="Content\js\CrudOps\Acct\Locker\JustDoItWK.js" />
     <Content Include="Content\js\CrudOps\Acct\Locker\WorkOuts.js" />
     <Content Include="Content\js\CrudOps\Anoym\WorkOuts.js" />
     <Content Include="Content\js\libs\dataTables.bootstrap.js" />
@@ -609,6 +610,7 @@
     <Content Include="Views\Account\LogOff.cshtml" />
     <Content Include="Views\WorkOuts\Search.cshtml" />
     <Content Include="Views\Locker\Index.cshtml" />
+    <Content Include="Views\Locker\JustDoItWK.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

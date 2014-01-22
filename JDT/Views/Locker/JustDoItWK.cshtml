@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Just Do It";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title" id="workOutTitle"></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10" id="exContainer">
+            
+        </div>
+    </div>
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/dashboard/jqueryplugins")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/site")
+    @Scripts.Render("~/Content/js/CrudOps/Acct/Locker/JustDoItWK.js")
+    @Scripts.Render("~/bundles/jqueryplugins")
+
+    <script>
+        $(document).ready(function () {
+            initListAuth();
+
+        });
+
+    </script>
+}
