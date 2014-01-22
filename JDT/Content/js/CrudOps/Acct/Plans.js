@@ -95,6 +95,10 @@ function populateList(email) {
             }, {
                 "name": "DT_RowId",
                 "type": "hidden",
+            },
+            {
+                "name": "WorkOuts",
+                "type": "hidden",
             }
             ],
             "i18n": {

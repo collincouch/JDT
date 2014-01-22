@@ -87,6 +87,9 @@ function populateList(email) {
             }, {
                 "name": "DT_RowId",
                 "type": "hidden",
+            }, {
+                "name": "Exercises",
+                "type": "hidden",
             }
             ],
             "i18n": {

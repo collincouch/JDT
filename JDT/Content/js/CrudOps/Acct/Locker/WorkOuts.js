@@ -168,35 +168,39 @@ function populateList(email, callback) {
             //console.log('locker id ' + snapShot.val().LockerId);
             lockersRef.child(snapShot.val().LockerId + '/JustDoThis/WorkOuts/').once('value', function (lockerSnapShot) {
                 populateDataTable();
-                var numOfWorkOuts = lockerSnapShot.numChildren();
-                
+                var numOfWorkOuts = 0;
+                lockerSnapShot.forEach(function (childSnapShot) {
+                    if (childSnapShot.val().Status.toUpperCase() != "REMOVED")
+                        numOfWorkOuts++;
+                })
                 lockerSnapShot.forEach(function (childSnapShot) {
                     //console.log('workOut ' + childSnapShot.name());
-                    
-                    workOutsRef.child(childSnapShot.name()).once('value', function (workOutSnapShot) {
-                        //workOutExercises.on('child_added', workOutsExercisesAdded);
-                        //workOutName = 
-                        $('#accordion3').append(renderAccordion(childSnapShot.name(), workOutSnapShot.val().Name, childSnapShot.val().Status));
+                    if (lockerSnapShot.child(childSnapShot.name()).
+                        val().Status.toUpperCase() != "REMOVED") {
+                        workOutsRef.child(childSnapShot.name()).once('value', function (workOutSnapShot) {
 
-                        $('#bdg_' + childSnapShot.name()).on('click', function () {
-                            updateWorkOutStatus($(this).data('action'), childSnapShot.name());
-                        });
+                            $('#accordion3').append(renderAccordion(childSnapShot.name(), workOutSnapShot.val().Name, childSnapShot.val().Status));
 
-                        populateInitArray(childSnapShot.name(), function (x) {
-                            //console.log('push 1');
-                            arrMaster.push(x);
-                            if (arrMaster.length == numOfWorkOuts) {
-                                //console.log('asdfsdfsdf');
-                                callback(childSnapShot.name());
-                            }
-                            //console.log('push 2');
-                        });
+                            $('#bdg_' + childSnapShot.name()).on('click', function () {
+                                updateWorkOutStatus($(this).data('action'), childSnapShot.name());
+                            });
 
-                        //console.log('arrMaster length' + arrMaster.length);
-                        
-                        
-                        
-                    })
+                            populateInitArray(childSnapShot.name(), function (x) {
+                                //console.log('push 1');
+                                arrMaster.push(x);
+                                if (arrMaster.length == numOfWorkOuts) {
+                                    //console.log('asdfsdfsdf');
+                                    callback(childSnapShot.name());
+                                }
+                                //console.log('push 2');
+                            });
+
+                            //console.log('arrMaster length' + arrMaster.length);
+
+
+
+                        })
+                    }
                     
                 })
                 
