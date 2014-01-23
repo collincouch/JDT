@@ -58,8 +58,9 @@
 
 
                     } else {
-                        //console.log('invalid uid/pwd');
-                        window.location.replace("../Account/Login");
+                        var loginUrl = '@Url.Action("Login","Account")';
+                        console.log('loginurl: ' + loginUrl);
+                        window.location.replace(loginUrl);
                     }
 
                 });

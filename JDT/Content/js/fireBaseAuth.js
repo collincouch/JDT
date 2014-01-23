@@ -77,7 +77,7 @@ function getUserIdByEmail(emailAddress, callback) {
 function createNewUser(userRecord,email, password, callback) {
     //console.log('createNewUser ' + email + ' '  + password);
     
-    var userEmail = email;
+    var userEmail = email.toLowerCase();
     var userPwd = password;
     try {
         //console.log('fbUsers Path ' + fbUsers.toString());

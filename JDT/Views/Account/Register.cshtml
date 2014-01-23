@@ -94,7 +94,9 @@
 
                 } else {
                     //console.log('invalid uid/pwd');
-                    auth.createUser($("#Email").val(), $("#Password").val(), function (error, user) {
+                    var e = $("#Email").val();
+                    var e1 = e.toLowerCase();
+                    auth.createUser(e1, $("#Password").val(), function (error, user) {
                         if (!error) {
                             createUserObject(function (userName) {
                                 //console.log('userId ' + userName);
@@ -148,7 +150,8 @@
             var userName = $("#UserName").val();
             var firstName = $("#FirstName").val();
             var lastName = $("#LastName").val();
-            var email = $("#Email").val();
+            var e = $("#Email").val();
+            var email = e.toLowerCase();
             var password = $("#Password").val();
             
             try {

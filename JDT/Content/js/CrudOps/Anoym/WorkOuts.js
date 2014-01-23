@@ -79,15 +79,16 @@ function populateList(email) {
     ];
 
     getUserIdByEmail(email, function (uid) {
-        //console.log('asdfsadf');
+        console.log('uid: ' + uid);
         //initializeDataTable();
         //console.log('asdfsadf');
         //planWorkOutsRef = plansRef.child(planName + '/WorkOuts/');
-        //console.log('planWorkOutRef ' + planWorkOutsRef.toString());
+        //console.log('userRef ' + userRef.child(uid).toString());
         userId = uid;
         userRef.child(uid).once('value', function (snapShot) {
-
+            
             lockerId = snapShot.val().LockerId;
+           
         });
         workOutsRef.on('child_added', workOutsAdded);
 
@@ -102,30 +103,42 @@ function populateList(email) {
 
 }
 
+function pushAndInitTable(obj)
+{
+    
+    records.push(obj);
+    initializeDataTable();
 
-var workOutsAdded = function (snapShot) {
-    console.log('work out added');
-    workOutsRef.child(snapShot.name()).once("value", function (childSnapShot) {
+}
 
-        var o = childSnapShot.val();
-        //console.log
-        o.DT_RowId = childSnapShot.name();
+var workOutsAdded = function (snapShot,callback) {
+   
 
-        //console.log('locker id ' + snapShot.val().LockerId);
-        lockersRef.child(lockerId + '/JustDoThis/WorkOuts/' + childSnapShot.name()).once('value', function (lockerSnapShot) {
-           
-            if (lockerSnapShot.val().Status != "Removed")
+    if (snapShot.hasChild('Exercises')) {
+        var o = snapShot.val();
+
+        o.DT_RowId = snapShot.name();
+
+
+
+        ////console.log('locker id ' + snapShot.val().LockerId);
+        lockersRef.child(lockerId + '/JustDoThis/WorkOuts/' + snapShot.name()).once('value', function (lockerSnapShot) {
+
+            if (lockerSnapShot.hasChildren()) {
+
+                if (lockerSnapShot.val().Status.toUpperCase() != "REMOVED") {
                     o.InLocker = true;
 
-            records.push(o);
-            initializeDataTable();
+                }
+
+            }
+            callback(pushAndInitTable(o));
         });
 
+    }
         
-
-    });
     
-    //console.log('records length ' + records.length);
+  
 }
 
 var workOutsChanged = function (snapShot) {

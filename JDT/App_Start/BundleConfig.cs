@@ -30,7 +30,8 @@ namespace JDT
                     "~/Content/js/libs/TableTools.js",
                     "~/Content/js/libs/dataTables.editor.js",
                     "~/Content/js/libs/dataTables.bootstrap.js",
-                    "~/Content/js/libs/dataTables.editor.bootstrap.js"));
+                    "~/Content/js/libs/dataTables.editor.bootstrap.js",
+                    "~/Content/js/libs/jquery.timer.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/dashboard/jqueryplugins").Include(
                        "~/Content/js/libs/icheck.js/jquery.icheck.js",
