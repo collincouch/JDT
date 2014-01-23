@@ -31,7 +31,7 @@ namespace JDT
                     "~/Content/js/libs/dataTables.editor.js",
                     "~/Content/js/libs/dataTables.bootstrap.js",
                     "~/Content/js/libs/dataTables.editor.bootstrap.js",
-                    "~/Content/js/libs/jquery.timer.js"));
+                    "~/Content/js/libs/jquery.runner.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/dashboard/jqueryplugins").Include(
                        "~/Content/js/libs/icheck.js/jquery.icheck.js",
@@ -98,6 +98,9 @@ namespace JDT
 
             bundles.Add(new StyleBundle("~/Content/css/bundles").
                 Include("~/Content/css/application.css"));
+
+            bundles.Add(new StyleBundle("~/Content/css/stopwatch/bundles").
+                Include("~/Content/css/jq.stopwatch.css"));
 
             bundles.Add(new StyleBundle("~/Content/css/datatables/bundles").
                 Include(

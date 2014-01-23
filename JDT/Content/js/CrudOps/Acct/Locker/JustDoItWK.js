@@ -41,12 +41,44 @@ function initListAuth() {
                 var key
                 for (key in value)
                 {
-                    initializeDataTable(key,value[key]);
-                }
 
+                    
+                    initializeDataTable(key, value[key], function (tableid) {
+                        $('#stopwatch_' + tableid).runner();
+                        $('.stopwatch_startstop_' + tableid).on('click', function (event) {
+                            event.preventDefault();
+                            $('.stopwatch_startstop_' + tableid).toggle();
+                            $('#stopwatch_' + tableid).runner('toggle');
+
+                        });
+                        $('#stopwatch_reset_' + tableid).on('click', function (event) {
+                            event.preventDefault();
+                            $('#stopwatch_' + tableid).runner('reset');
+
+                        });
+
+                        $.each(value[key], function (i, v) {
+                            $('.act_' + key + '_Set' + (i + 1)).on('click', function (event) {
+                                event.preventDefault();
+                            //alert('ffjfjf');
+                            $('.act_' + key + '_Set' + (i + 1)).toggle();
+                            });
+
+                        });
+                        
+
+                    });
+
+                   
+                   
+ 
+                }
+               
                
 
             });
+
+
             //
         });
 
@@ -94,14 +126,14 @@ function populateInitArray(dataTableId, targetSets, weight, reps, set, callback)
         o.Reps = reps;
         if (o.Weight == null || o.Reps == null) {
             o.cssStyle = "badge badge-success";
-            o.Action = "Update";
+            o.Action = "Save";
         }
         else {
 
-            o.cssStyle = "badge badge-important";
+            o.cssStyle = "badge badge-warning";
             o.Action = "Edit";
         }
-        o.DTRow_Id = dataTableId + "_Set" + (i + 1);
+        o.DT_RowId = dataTableId + "_Set" + (i + 1);
         rows.push(o);
     }
         
@@ -121,7 +153,7 @@ function populateList(email, callback) {
 
         userRef.child(uid).once('value', function (snapShot) {
 
-            console.log('locker id ' + lockersRef.child(snapShot.val().LockerId + '/Active/').child(workOutName).toString());
+            //console.log('locker id ' + lockersRef.child(snapShot.val().LockerId + '/Active/').child(workOutName).toString());
             
             lockersRef.child(snapShot.val().LockerId + '/Active/').child(workOutName).once('value', function (activeWorkOutSnapShot) {
                 populateDataTable();
@@ -185,11 +217,39 @@ function renderTable(exerciseId, exerciseName, target) {
     console.log(target);
     var s = "<section class=\"widget\">"
                 + "<header>"
+                    + "<div class=\"row\">"
+                    + "<div class=\"col-md-9\">"
                     + "<h4>"
                         + "<i class=\"fa fa-list-alt\"></i>"
                         + exerciseName + " | Rep Target: " + target
                     + "</h4>"
+                    + "</div>"
+                    + "<div class=\"col-md-3\">"
                     + "<div id=\"stopwatch_" + exerciseId + "\"/>"
+                        + "<div class=\"row\">"
+                        + "<div class=\"col-xs-3\">"
+                        + "<div class=\"stopwatch_startstop_" + exerciseId + "\">"
+                        + "<a data-action=\"\" href=\"\">"
+                        + "<span class=\"badge badge-success\">Start</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "<div class=\"stopwatch_startstop_" + exerciseId + "\" style=\"display: none\">"
+                        + "<a data-action=\"\" href=\"\">"
+                        + "<span class=\"badge badge-danger\">Stop</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "</div>"
+                        + "<div class=\"col-xs-3\">"
+                        + "<div id=\"stopwatch_reset_" + exerciseId + "\">"
+                        + "<a data-action=\"\" href=\"#\">"
+                        + "<span class=\"badge badge-info\">Reset</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "</div>"
+                        + "</div>"
+                    + "</div>"
+                    + "</div>"
+                    + "</div>"
                 + "</header>"
            + "<table class=\"table table-striped table-bordered dataTable\" id=\"tbl_" + exerciseId + "\">"
             + "<thead>"
@@ -247,13 +307,29 @@ function populateDataTable()
     {
         
 
-        sDefaultContent: "<a id=\"act_Set_\" data-action=\"\" href=\"#\">"
-        + "<span class=\"badge badge-success\" id=\"status_\">Edit</span>"
+        sDefaultContent: "<div class=\"" + + "\"<a id=\"act_Set_\" data-action=\"\" href=\"\">"
+        + "<span class=\"badge badge-success\" id=\"status_\">Save</span>"
         + "</a>",
         mRender: function (data, type, row) {
-            var returnVal = "<a id=\"act_Set_" + row.SetNum + "\" data-action=\"" + row.Action + "\" href=\"#\">"
-        + "<span class=\"" + row.cssStyle + "\">" + row.Action + "</span>"
-        + "</a>";
+            var returnVal;
+            if (row.Weight == null || row.Reps == null) {
+                returnVal = "<div class=\"act_" + row.DT_RowId + "\"><a href=\"\">"
+                       + "<span class=\"badge badge-success\">Save</span>"
+                       + "</a></div>"
+                       + "<div class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
+                       + "<span class=\"badge badge-warning\">Edit</span>"
+                       + "</a></div>";
+
+            }
+            else {
+                returnVal = "<div class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
+                       + "<span class=\"badge badge-success\">Save</span>"
+                       + "</a></div>"
+                       + "<div class=\"act_" + row.DT_RowId + "\"><a href=\"\">"
+                       + "<span class=\"badge badge-warning\">Edit</span>"
+                       + "</a></div>"
+            }
+             
             return returnVal;
         },
         "aTargets": [5]
@@ -269,8 +345,8 @@ function populateDataTable()
 
 
 
-function initializeDataTable(tableId, rows) {
-
+function initializeDataTable(tableId, rows, callback) {
+    //initializeStopWatch(tableId);
     //console.log('rows length ' + rows.length);
     oTable = $('#tbl_' + tableId).dataTable({
         "aaData": rows,
@@ -280,68 +356,9 @@ function initializeDataTable(tableId, rows) {
             "bLengthChange": false,
         });
 
-    initializeStopWatch(tableId);
+    if (oTable != null)
+        callback(tableId);
 }
 
-function initializeStopWatch(exerciseId) {
-    var wkStopWatch = new (function (exerciseId) {
-        console.log('exercise id ' + exerciseId);
-        var $stopwatch, // Stopwatch element on the page
 
-            incrementTime = 70, // Timer speed in milliseconds
-
-            currentTime = 0, // Current time in hundredths of a second
-
-            updateTimer = function () {
-
-                $stopwatch.html(formatTime(currentTime));
-
-                currentTime += incrementTime / 10;
-
-            },
-
-            init = function () {
-
-                $stopwatch = $('#stopwatch_' + exerciseId);
-
-                wkStopWatch.Timer = $.timer(updateTimer, incrementTime, true);
-
-            };
-
-        this.resetStopwatch = function () {
-
-            currentTime = 0;
-
-            this.Timer.stop().once();
-
-        };
-
-        $(init);
-
-    });
-}
-
-// Common functions
-
-function pad(number, length) {
-
-    var str = '' + number;
-
-    while (str.length < length) { str = '0' + str; }
-
-    return str;
-
-}
-
-function formatTime(time) {
-
-    var min = parseInt(time / 6000),
-
-        sec = parseInt(time / 100) - (min * 60),
-
-        hundredths = pad(time - (sec * 100) - (min * 6000), 2);
-
-    return (min > 0 ? pad(min, 2) : "00") + ":" + pad(sec, 2) + ":" + hundredths;
-
-}
 

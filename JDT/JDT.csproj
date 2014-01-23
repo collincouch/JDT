@@ -184,10 +184,16 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Content\css\dataTables.bootstrap.css" />
     <Content Include="Content\css\dataTables.editor.css" />
+    <Content Include="Content\css\jq.stopwatch.css" />
+    <Content Include="Content\css\jq.stopwatch.min.css" />
     <Content Include="Content\css\TableTools.css" />
     <Content Include="Content\js\CrudOps\Acct\Locker\JustDoItWK.js" />
     <Content Include="Content\js\CrudOps\Acct\Locker\WorkOuts.js" />
     <Content Include="Content\js\CrudOps\Anoym\WorkOuts.js" />
+    <Content Include="Content\js\libs\jq.stopwatch.js" />
+    <Content Include="Content\js\libs\jq.stopwatch.min.js" />
+    <Content Include="Content\js\libs\jquery.runner-min.js" />
+    <Content Include="Content\js\libs\jquery.runner.js" />
     <Content Include="Content\js\libs\jquery.timer.js" />
     <Content Include="Content\js\libs\dataTables.bootstrap.js" />
     <Content Include="Content\js\libs\dataTables.editor.bootstrap.js" />
