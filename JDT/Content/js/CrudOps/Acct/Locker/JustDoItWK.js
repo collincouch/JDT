@@ -36,56 +36,88 @@ function initListAuth() {
 
             $.each(arrMaster, function (index, value) {
 
-                //console.log('key: ' + value.name());
-                //console.log('value: ' + JSON.stringify(value));
-                var key
-                for (key in value)
-                {
+                //    //console.log('key: ' + value.name());
+                //    //console.log('value: ' + JSON.stringify(value));
+                    var key
+                    for (key in value)
+                    {
 
-                    
+
                     initializeDataTable(key, value[key], function (tableid) {
                         $('#stopwatch_' + tableid).runner();
                         $('.stopwatch_startstop_' + tableid).on('click', function (event) {
-                            event.preventDefault();
-                            $('.stopwatch_startstop_' + tableid).toggle();
-                            $('#stopwatch_' + tableid).runner('toggle');
+                    event.preventDefault();
+                    $('.stopwatch_startstop_' + tableid).toggle();
+                    $('#stopwatch_' + tableid).runner('toggle');
 
-                        });
-                        $('#stopwatch_reset_' + tableid).on('click', function (event) {
-                            event.preventDefault();
-                            $('#stopwatch_' + tableid).runner('reset');
+                    $('.txtwght_' + key).each(function () {
+                        console.log('weight');
+                        if (!$('#txtWght_' + key + '_Set' + (index + 1)).val()) {
+                            console.log('weight empty');
+                            $('.wght_' + key + '_Set' + (index + 1)).toggle();
+                            
+                            return false;
+                        }
+                    })
 
-                        });
+                    $('.txtreps_' + key).each(function () {
+                        console.log('reps');
+                        if (!$('#txtReps_' + key + '_Set' + (index + 1)).val()) {
+                            console.log('Reps empty');
+                            $('.reps_' + key + '_Set' + (index + 1)).toggle();
+                            return false;
+                        }
+                    });
 
-                        $.each(value[key], function (i, v) {
-                            $('.act_' + key + '_Set' + (i + 1)).on('click', function (event) {
-                                event.preventDefault();
-                            //alert('ffjfjf');
-                            $('.act_' + key + '_Set' + (i + 1)).toggle();
-                            });
+                    $('.act_' + key).each(function () {
 
-                        });
+                        if ($('#txtReps_' + key + '_Set' + (index + 1)).val()!="" ||
+                            $('#txtWght_' + key + '_Set' + (index + 1)).val()!="") {
+                            
+                            $('.act_' + key + '_Set' + (index + 1)).toggle();
+                            return false;
+                        }
                         
+                    });
+                   
+
+                    $('#stopwatch_reset_' + tableid).on('click', function (event) {
+                        event.preventDefault();
+                        $('#stopwatch_' + tableid).runner('reset');
 
                     });
 
-                   
-                   
- 
-                }
-               
-               
+                    $.each(value[key], function (i, v) {
+                        $('.act_' + key + '_Set' + (i + 1)).on('click', function (event) {
+                            event.preventDefault();
+                            //alert('ffjfjf');
+                            $('.act_' + key + '_Set' + (i + 1)).toggle();
+                            $('.wght_' + key + '_Set' + (i + 1)).toggle();
+                            $('.reps_' + key + '_Set' + (i + 1)).toggle();
+                        });
+                    });
+                    });
+
+
+
+                     });
+
+
+
+
+                    }
+
+
+
+
+
+                
 
             });
-
-
-            //
-        });
-
-        
        
         
-    })
+            });
+    });
     
     
 }
@@ -134,6 +166,7 @@ function populateInitArray(dataTableId, targetSets, weight, reps, set, callback)
             o.Action = "Edit";
         }
         o.DT_RowId = dataTableId + "_Set" + (i + 1);
+        o.ExerciseId = dataTableId;
         rows.push(o);
     }
         
@@ -287,17 +320,21 @@ function populateDataTable()
     columns = [
     { mData: "SetNum", sTitle: "Set #" },
     {
-        sDefaultContent: "<input type=\"text\" id=\"txtWeight_\" size=\"2\" maxlength=\"2\" width=\"20px\" />",
+        sDefaultContent: "<input type=\"text\" class=\"wght_\" id=\"txtWeight_\" disabled=\"disabled\" size=\"2\" maxlength=\"2\" width=\"20px\" />",
         mRender: function (data, type, row) {
-            var returnVal = "<input type=\"text\" id=\"txtWeight_" + row.DT_RowId + "\" size=\"2\" maxlength=\"2\" width=\"20px\" />";
+            var returnVal = "<div class=\"wght_" + row.ExerciseId + " wght_" + row.DT_RowId + "\"  style=\"display: none\">"
+                + "<input type=\"text\" class=\"txtwght_" + row.ExerciseId + "\" id=\"txtWeight_" + row.DT_RowId + "\" size=\"2\" maxlength=\"2\" width=\"20px\" /></div>"
+             + "<div class=\"wght_" + row.ExerciseId + " wght_" + row.DT_RowId + "\"\">0</div>";
             return returnVal;
         },
         "aTargets": [1]
     },
     {
-        sDefaultContent: "<input type=\"text\" id=\"txtReps_\" size=\"2\" maxlength=\"2\" width=\"20px\" />",
+        sDefaultContent: "<input type=\"text\" class=\"reps_\" disabled=\"disabled\" id=\"txtReps_\" size=\"2\" maxlength=\"2\" width=\"20px\" />",
         mRender: function (data, type, row) {
-            var returnVal = "<input type=\"text\" id=\"txtReps" + row.DT_RowId + "\" size=\"2\" maxlength=\"2\" width=\"20px\" />";
+            var returnVal = "<div class=\"reps_" + row.ExerciseId + " reps_" + row.DT_RowId + "\"  style=\"display: none\">"
+                + "<input type=\"text\" class=\"txtreps_" + row.ExerciseId + "\"  disabled=\"disabled\" id=\"txtReps" + row.DT_RowId + "\" size=\"2\" maxlength=\"2\" width=\"20px\" /></div>"
+            + "<div class=\"reps_" + row.ExerciseId + " reps_" + row.DT_RowId + "\">0</div>";
             return returnVal;
         },
         "aTargets": [2]
@@ -312,24 +349,30 @@ function populateDataTable()
         + "</a>",
         mRender: function (data, type, row) {
             var returnVal;
-            if (row.Weight == null || row.Reps == null) {
-                returnVal = "<div class=\"act_" + row.DT_RowId + "\"><a href=\"\">"
-                       + "<span class=\"badge badge-success\">Save</span>"
-                       + "</a></div>"
-                       + "<div class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
-                       + "<span class=\"badge badge-warning\">Edit</span>"
-                       + "</a></div>";
+            //if (row.Weight == null || row.Reps == null) {
+            //    returnVal = "<div class=\"act_" + row.DT_RowId + "\"><a href=\"\">"
+            //           + "<span class=\"badge badge-success\">Save</span>"
+            //           + "</a></div>"
+            //           + "<div class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
+            //           + "<span class=\"badge badge-warning\">Edit</span>"
+            //           + "</a></div>";
 
-            }
-            else {
-                returnVal = "<div class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
+            //}
+            //else {
+            //    returnVal = "<div class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
+            //           + "<span class=\"badge badge-success\">Save</span>"
+            //           + "</a></div>"
+            //           + "<div class=\"act_" + row.DT_RowId + "\"><a href=\"\">"
+            //           + "<span class=\"badge badge-warning\">Edit</span>"
+            //           + "</a></div>"
+            //}
+             
+            returnVal = "<div class=\"act_" + row.DT_RowId + " act_" + row.ExerciseId + "\" style=\"display:none\"><a href=\"\">"
                        + "<span class=\"badge badge-success\">Save</span>"
                        + "</a></div>"
                        + "<div class=\"act_" + row.DT_RowId + "\"><a href=\"\">"
                        + "<span class=\"badge badge-warning\">Edit</span>"
                        + "</a></div>"
-            }
-             
             return returnVal;
         },
         "aTargets": [5]
