@@ -10,9 +10,10 @@ var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
 var planWorkOutsRef = plansRef.child(planName + '/WorkOuts/');
 var lockersRef = new Firebase('https://jdt.firebaseio.com/Lockers/');
 var exercisesRef = new Firebase('https://jdt.firebaseio.com/Exercises/');
+var setsRef = new Firebase('https://jdt.firebaseio.com/Sets/');
 var workOutExercisesRef;
 var userPlansRef;
-
+var lockerId;
 var arrMaster = [];
 var columns;
 var workOutEx = [];
@@ -26,55 +27,51 @@ jQuery.removeFromArray = function (value, arr) {
 };
 
 function initListAuth() {
-    
-    initializeAuth(function (email) {
+
+    initializeAuth(function(email) {
         setHeader(email);
         setSideNav(email);
         var statusClickEvent = false;
-        updateStatus(email, function () {
+        updateStatus(email, function() {
             //console.log('updateStatus');
         });
 
-        populateList(email, function (dataTableId) {
-            
-            populateInitArray(dataTableId, function (tableId) {
-                
-                
-                
-            });
-           
-            console.log('master arr: ' + arrMaster.length);
+        var date = getTodaysDate(':');
+        populateList(email, date ,function(dataTableId) {
 
-            $.each(arrMaster, function (index, value) {
+            populateInitArray(dataTableId, function(tableId) {
+
+
+            });
+
+            //console.log('master arr: ' + arrMaster.length);
+
+            $.each(arrMaster, function(index, value) {
 
                 //console.log('key: ' + value.name());
                 //console.log('value: ' + JSON.stringify(value));
-                var key
-                for (key in value)
-                {
-                    initializeDataTable(key,value[key]);
+                var key;
+                for (key in value) {
+                    initializeDataTable(key, value[key]);
                 }
 
-               
 
             });
             //
         });
 
-        
-       
-        
-    })
-    
-    
+
+    });
+
+
 }
 
-function getTodaysDate() {
+function getTodaysDate(delimiter) {
     var d = new Date();
     var month = d.getMonth() + 1;
     var day = d.getDate();
-    var output = d.getFullYear() + '/' +
-        (month < 10 ? '0' : '') + month + '/' +
+    var output = d.getFullYear() + delimiter +
+        (month < 10 ? '0' : '') + month + delimiter +
         (day < 10 ? '0' : '') + day;
 
     return output;
@@ -85,14 +82,14 @@ function populateInitArray(dataTableId, callback) {
     var numChild;
     //var z = [];
     var rows = [];
-    console.log('populateInitArray');
+    //console.log('populateInitArray');
     workOutExercisesRef.once('value', function (snap) {
         if (snap.val() == null)
             callback(z);
             //numChild = 0;
 
         numChild = snap.numChildren();
-        console.log('number of Children ' + numChild);
+        //console.log('number of Children ' + numChild);
     });
     
    
@@ -130,12 +127,12 @@ function countProperties(obj) {
     return propCount;
 }
 
-function updateStatus(email, callback)
+function updateStatus(email, date, callback)
 {
     getUserIdByEmail(email, function (uid) {
 
         userRef.child(uid).once('value', function (snapShot) {
-            var userLock = lockersRef.child(snapShot.val().LockerId + '/JustDoThis/WorkOuts/');
+            var userLock = lockersRef.child(snapShot.val().LockerId + '/JustDoThis/WorkOuts/' + date);
             userLock.on('value', function (lockerSnapShot) {
                 //console.log('iiiii');
                 lockerSnapShot.forEach(function (childSnapShot) {
@@ -146,7 +143,10 @@ function updateStatus(email, callback)
                         //console.log(s);
                         $('#bdg_' + childSnapShot.name()).replaceWith(s);
                         $('#bdg_' + childSnapShot.name()).on('click', function () {
-                            updateWorkOutStatus($(this).data('action'), childSnapShot.name());
+                            updateWorkOutStatus($(this).data('action'), childSnapShot.name(), function()
+                            {
+                                window.location = "/Locker/JustDoItWK/" + childSnapShot.name();
+                        });
                         });
                         callback();
                     });
@@ -158,34 +158,39 @@ function updateStatus(email, callback)
     });
 }
 
-function populateList(email, callback) {
+function populateList(email, date, callback) {
     
   
     getUserIdByEmail(email, function (uid) {
 
         userRef.child(uid).once('value', function (snapShot) {
 
-            //console.log('locker id ' + snapShot.val().LockerId);
-            lockersRef.child(snapShot.val().LockerId + '/JustDoThis/WorkOuts/').once('value', function (lockerSnapShot) {
+            console.log('locker id ' + snapShot.val().LockerId);
+            lockerId = snapShot.val().LockerId;
+            lockersRef.child(snapShot.val().LockerId + '/JustDoThis/WorkOuts/'
+               ).once('value', function (lockerSnapShot) {
                 populateDataTable();
                 var numOfWorkOuts = 0;
-                lockerSnapShot.forEach(function (childSnapShot) {
+                lockerSnapShot.forEach(function(childSnapShot) {
                     if (childSnapShot.val().Status.toUpperCase() != "REMOVED")
                         numOfWorkOuts++;
-                })
-                lockerSnapShot.forEach(function (childSnapShot) {
-                    //console.log('workOut ' + childSnapShot.name());
+                });
+                lockerSnapShot.forEach(function(childSnapShot) {
+                    console.log('workOut ' + childSnapShot.name());
                     if (lockerSnapShot.child(childSnapShot.name()).
                         val().Status.toUpperCase() != "REMOVED") {
-                        workOutsRef.child(childSnapShot.name()).once('value', function (workOutSnapShot) {
+                        workOutsRef.child(childSnapShot.name()).once('value', function(workOutSnapShot) {
 
                             $('#accordion3').append(renderAccordion(childSnapShot.name(), workOutSnapShot.val().Name, childSnapShot.val().Status));
 
-                            $('#bdg_' + childSnapShot.name()).on('click', function () {
-                                updateWorkOutStatus($(this).data('action'), childSnapShot.name());
+                            $('#bdg_' + childSnapShot.name()).on('click', function() {
+                                updateWorkOutStatus($(this).data('action'), childSnapShot.name(), function() {
+                                    window.location = "/Locker/JustDoItWK/" + childSnapShot.name();
+
+                                });
                             });
 
-                            populateInitArray(childSnapShot.name(), function (x) {
+                            populateInitArray(childSnapShot.name(), function(x) {
                                 //console.log('push 1');
                                 arrMaster.push(x);
                                 if (arrMaster.length == numOfWorkOuts) {
@@ -198,13 +203,12 @@ function populateList(email, callback) {
                             //console.log('arrMaster length' + arrMaster.length);
 
 
-
-                        })
+                        });
                     }
-                    
-                })
-                
-                
+
+                });
+
+
             });
             
            
@@ -219,33 +223,99 @@ function populateList(email, callback) {
     }
 
 
-function updateWorkOutStatus(action,workOutId) {
+function updateWorkOutStatus(action,workOutId,callback) {
     console.log(action);
     initializeAuth(function (email) {
         getUserIdByEmail(email, function (uid) {
             userRef.child(uid).once('value', function (snapShot) {
-                var o = {
-                    'DateModified': getTodaysDate(),
+                var o1 = {
+                    'DateModified': getTodaysDate('/'),
 
                 };
                 var lockerWorkOutRef = lockersRef.child(snapShot.val().LockerId).child('JustDoThis').child('WorkOuts').child(workOutId);
+                var setsExist=false;
                 switch (action.toUpperCase()) {
                     case 'START':
-                        o.Status = 'ACTIVE';
+                        o1.Status = 'ACTIVE';
                         break;
-                    case 'Remove':
-                        o.Status = 'Removed';
+                    case 'REMOVE':
+                        o1.Status = 'REMOVED';
                         break;
-                    case 'STOP':
-                        o.Status = 'STOPPED';
+                    case 'CONTINUE':
+                        o1.Status = 'ACTIVE';
                         break;
                 }
 
-                lockerWorkOutRef.update(o, function () {
-                    console.log('status: ' + o.Status.toUpperCase());
-                    if (o.Status.toUpperCase() == "ACTIVE")
-                        lockersRef.child(snapShot.val().LockerId + "/Active/").child(workOutId).set(Firebase.ServerValue.TIMESTAMP);
+                lockerWorkOutRef.child(getTodaysDate(':')).on('value', function(snap) {
+                    setsExist = snap.hasChildren();
+
                 });
+
+                lockerWorkOutRef.update(o1, function () {
+                    console.log('status: ' + o1.Status.toUpperCase());
+                    if (o1.Status.toUpperCase() == "ACTIVE" && !setsExist) {
+
+                        userRef.child(uid).once('value', function (snapShot) {
+
+                            workOutsRef.
+                                child(workOutId).
+                                child("Exercises").
+                                on('value', function (sapper) {
+                                    sapper.forEach(function (exSnap) {
+                                        exercisesRef.
+                                        child(exSnap.name())
+                                        .on('value', function (childSnap) {
+                                            //console.log('exercise ' + JSON.stringify(childSnap.val()));
+                                            var numSets = childSnap.val().RecMaxSets;
+                                            //console.log('num sets ' + numSets);
+                                            for (var i = 0; i < numSets; i++) {
+                                                //var o; //= childSnap.val();
+                                                var todaysDate = getTodaysDate(':');
+                                                var o = {};
+                                                o.Set = (i + 1);
+                                                //console.log('fjfjfj');
+                                                o.ExerciseId = childSnap.name();
+                                                o.WorkOutId = workOutId;
+                                                o.Weight = "";
+                                                o.Reps = "";
+                                                o.Time = "";
+                                                o.Trend = "";
+                                                //console.log('o ' + JSON.stringify(o));
+                                                var setId = setsRef.
+                                                child(todaysDate) //TODO: need to verify set being submitted is from an unfinished workout from another day
+                                                    .push(o).name();
+                                                lockersRef.
+                                                    child(lockerId).
+                                                    child("JustDoThis").
+                                                    child("WorkOuts").
+                                                    child(workOutId).
+                                                    child(todaysDate).
+                                                    child("Exercises").
+                                                    child(exSnap.name()).
+                                                    child("Sets").
+                                                    child(setId).
+                                                    set(Firebase.ServerValue.TIMESTAMP, function (err) {
+                                                        console.log("success");
+                                                    });
+                                            }
+
+                                            callback();
+                                        });
+                                    });
+
+
+                                });
+
+
+                            
+
+                        });
+
+                    } else {
+                        callback();
+                    }
+                });
+                
             });
 
             });
@@ -268,9 +338,9 @@ function renderStatusButton(workOutName, currentStatus) {
             text = "Start";
             break;
         case 'ACTIVE':
-            action = "Stop";
+            action = "Continue";
             cssStyle = "badge badge-warning";
-            text = "Stop";
+            text = "Continue";
             break;
         case 'STOPPED':
             action = "Start";
@@ -279,7 +349,7 @@ function renderStatusButton(workOutName, currentStatus) {
             break;
     }
 
-    s = "<a id=\"bdg_" + workOutName + "\" data-action=\"" + action + "\" href=\"/Locker/JustDoItWK/" + workOutName + "\">"
+    s = "<a id=\"bdg_" + workOutName + "\" data-action=\"" + action + "\" href=\"#\">"
         + "<span class=\"" + cssStyle + "\" id=\"status_" + workOutName + "\">" + text + "</span>"
         + "</a>";
 
@@ -378,6 +448,7 @@ function populateDataTable()
 
 }
 
+//function checkIfWorkOutStarted()
 
 
 function initializeDataTable(tableId, rows) {
@@ -395,23 +466,21 @@ function initializeDataTable(tableId, rows) {
 }
 
 
-
-var workOutsExercisesAdded = function (snapShot) {
+var workOutsExercisesAdded = function(snapShot) {
     //console.log('added ' + snapShot.name());
     //var y = "2";
-    exercisesRef.child(snapShot.name()).once("value", function (childSnapShot) {
+    exercisesRef.child(snapShot.name()).once("value", function(childSnapShot) {
         //console.log('tset ' + childSnapShot.val().Name);
         var o = childSnapShot.val();
         o.DT_RowId = childSnapShot.name();
 
         rows.push(o);
-        
+
         initializeDataTable();
 
 
-       
     });
-   
-   
-} 
+
+
+};
 

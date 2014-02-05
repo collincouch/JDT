@@ -27,7 +27,7 @@ function initListAuth() {
         setHeader(email);
         setSideNav(email);
         populateList(email);
-    })
+    });
 }
 
 function countProperties(obj) {
@@ -271,7 +271,7 @@ var planWorkOutsAdded = function (snapShot) {
     });
 
     //console.log('records length ' + records.length);
-}
+};
 
 var planWorkOutsChanged = function (snapShot) {
     console.log('changed');

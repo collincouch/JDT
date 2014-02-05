@@ -3,7 +3,8 @@ var userLockerRef;
 var workOutsRef = new Firebase('https://jdt.firebaseio.com/WorkOuts/');
 var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
 var lockersRef = new Firebase('https://jdt.firebaseio.com/Lockers/');
-
+var setsRef = new Firebase('https://jdt.firebaseio.com/Sets/');
+var exercisesRef = new Firebase('https://jdt.firebaseio.com/Exercises/');
 var records = [];
 var columns;
 var userId;
@@ -20,11 +21,11 @@ jQuery.removeFromArray = function (value, arr) {
 
 
 function initListAuth() {
-    initializeAuth(function (email) {
+    initializeAuth(function(email) {
         setHeader(email);
         setSideNav(email);
         populateList(email);
-    })
+    });
 }
 
 function countProperties(obj) {
@@ -37,12 +38,12 @@ function countProperties(obj) {
     return propCount;
 }
 
-function getTodaysDate() {
+function getTodaysDate(delimater) {
     var d = new Date();
     var month = d.getMonth() + 1;
     var day = d.getDate();
-    var output = d.getFullYear() + '/' +
-        (month < 10 ? '0' : '') + month + '/' +
+    var output = d.getFullYear() + delimater +
+        (month < 10 ? '0' : '') + month + delimater +
         (day < 10 ? '0' : '') + day;
 
     return output;
@@ -58,7 +59,7 @@ function populateList(email) {
     { mData: "CreatedByUserName", sTitle: "Created By"},
     { mData: "DateCreated", sTitle: "Date Created", sClass: "hidden-xs" },
     {
-        sDefaultContent: "0",
+        mData:null,
         mRender: function (data, type, row) {
             //console.log(row);
             var returnVal = row.Exercises == null ? "<a href=\"/Exercises/Index/" + row.DT_RowId + "\">0</a>" : "<a href=\"/Exercises/Index/" + row.DT_RowId + "\">" + countProperties(row.Exercises) + "</a>";
@@ -67,15 +68,32 @@ function populateList(email) {
         "aTargets": [4]
     },
         {
-            sDefaultContent:"<input type=\"checkbox\" id=\"chkAdRmLocker_\" />",
+            mData:null,
             mRender: function (data, type, row) {
                 console.log('in locker: ' + row.InLocker);
-                var checked = row.InLocker == true ? "checked" : "";
-                var returnVal = "<input type=\"checkbox\" " + checked + " id=\"chkAdRmLocker_" + row.DT_RowId + "\" />";
+                var showHideAdd="";
+                var showHideRemove = "";
+                if (row.InLocker === undefined) {
+                    showHideRemove="display:none";
+                } 
+                else{
+                    showHideAdd = "display:none";
+                }
+                
+
+                //var returnVal = "<input type=\"checkbox\" " + checked + " id=\"chkAdRmLocker_" + row.DT_RowId + "\" />";
+                //return returnVal;
+                var returnVal;
+                returnVal = "<div data-act=\"Add\"  class=\"act_Add act_Add_Remove_" + row.DT_RowId + "\" id=\"AddToLocker_" + row.DT_RowId + "\" style=\"" + showHideAdd + "\"><a href=\"\">"
+                    + "<span class=\"badge badge-success\">Add To Locker</span>"
+                    + "</a></div>"
+                    + "<div data-act=\"Remove\" class=\"act_Add_Remove_" + row.DT_RowId + "\" style=\"" + showHideRemove + "\"><a href=\"\">"
+                    + "<span class=\"badge badge-warning\">In Locker</span>"
+                    + "</a></div>";
                 return returnVal;
             },
             "aTargets": [5]
-        },
+        }
     ];
 
     getUserIdByEmail(email, function (uid) {
@@ -103,16 +121,15 @@ function populateList(email) {
 
 }
 
-function pushAndInitTable(obj)
-{
-    
+var initDataTable = function pushAndInitTable(obj) {
+
     records.push(obj);
     initializeDataTable();
 
-}
+};
 
-var workOutsAdded = function (snapShot,callback) {
-   
+var workOutsAdded = function(snapShot, callback) {
+
 
     if (snapShot.hasChild('Exercises')) {
         var o = snapShot.val();
@@ -120,9 +137,8 @@ var workOutsAdded = function (snapShot,callback) {
         o.DT_RowId = snapShot.name();
 
 
-
-        ////console.log('locker id ' + snapShot.val().LockerId);
-        lockersRef.child(lockerId + '/JustDoThis/WorkOuts/' + snapShot.name()).once('value', function (lockerSnapShot) {
+////console.log('locker id ' + snapShot.val().LockerId);
+        lockersRef.child(lockerId + '/JustDoThis/WorkOuts/' + snapShot.name()).once('value', function(lockerSnapShot) {
 
             if (lockerSnapShot.hasChildren()) {
 
@@ -132,25 +148,24 @@ var workOutsAdded = function (snapShot,callback) {
                 }
 
             }
-            callback(pushAndInitTable(o));
+            callback(initDataTable(o));
         });
 
     }
-        
-    
-  
-}
-
-var workOutsChanged = function (snapShot) {
-    console.log('changed');
 
 
-    workOutsRef.child(snapShot.name()).on("value", function (childSnapShot) {
+};
+
+var workOutsChanged = function(snapShot) {
+    //console.log('changed');
+
+
+    workOutsRef.child(snapShot.name()).on("value", function(childSnapShot) {
         //console.log('plan changed ' + JSON.stringify(childSnapShot.val()));
         //console.log('record length ' + records.length);
         var o = childSnapShot.val();
         var i = 0;
-        $.each(records, function () {
+        $.each(records, function() {
             //console.log('this dtrowid ' + this.DT_RowId + ' snap ' + childSnapShot.name());
             //console.log('snap name ' + childSnapshot.name());
             if (this.DT_RowId == childSnapShot.name()) {
@@ -167,14 +182,14 @@ var workOutsChanged = function (snapShot) {
 
     });
 
-}
+};
 
-var workOutsRemoved = function (snapShot) {
+var workOutsRemoved = function(snapShot) {
     //console.log('record length before ' + records.length);
     var r = [];
 
 
-    workOutsRef.child(snapShot.name()).on("value", function (childSnapShot) {
+    workOutsRef.child(snapShot.name()).on("value", function(childSnapShot) {
         //console.log('value ' + childSnapShot.name());
 
         r = jQuery.removeFromArray(childSnapShot.name(), records);
@@ -183,7 +198,7 @@ var workOutsRemoved = function (snapShot) {
         initializeDataTable();
     });
 
-}
+};
 
 function initializeDataTable() {
     oTable = $('#datatable-table').dataTable({
@@ -194,33 +209,38 @@ function initializeDataTable() {
 
     });
 
-    $('input:checkbox').on('change', function (event) {
+    $('.act_Add').on('click', function (event) {
+
+        event.preventDefault();
         // State has changed to checked/unchecked.
         var arr = this.id.split('_');
-        var uid = userId
+        var uid = userId;
         var workOutId = arr[1];
         var o = {};
-        o.Status = this.checked == true ? "New" : "Removed";
+        o.Status = "New";
 
         userRef.child(uid).once('value', function (snapShot) {
-            
-            if(o.Status.toUpperCase()=="NEW")
-                o.DateCreated = getTodaysDate();
 
-            o.DateModified = getTodaysDate();
-            
-           
+            if (o.Status.toUpperCase() == "NEW")
+                o.DateCreated = getTodaysDate('/');
+
+            o.DateModified = getTodaysDate('/');
+
+            console.log('o: ' + JSON.stringify(o));
             var lockerRegisteredWorkOutRef = lockersRef.child(snapShot.val().LockerId + '/JustDoThis/WorkOuts/');
             try {
 
-                lockerRegisteredWorkOutRef.child(workOutId).set(o);
+                lockerRegisteredWorkOutRef.child(workOutId).set(o, function(err) {
+
+                    if (!err)
+                        $('.act_AddRemove_' + workOutId).toggle();
+                });
 
             } catch (e) {
 
                 console.log('An error occured ' + JSON.stringify(e));
             }
         });
-        
 
 
 
