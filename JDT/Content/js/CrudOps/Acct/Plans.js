@@ -7,25 +7,25 @@ var root = new Firebase('https://jdt.firebaseio.com');
 var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
 var lockersRef = new Firebase('https://jdt.firebaseio.com/Lockers/');
 var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
-
+var numOfPlans;
 var records = [];
 var columns;
 
 jQuery.removeFromArray = function (value, arr) {
-    //console.log('object to be removed ' + JSON.stringify(value));
+    console.log('object to be removed ' + JSON.stringify(value));
     return jQuery.grep(arr, function (elem, index) {
-        //console.log(' removing ' + elem.DT_RowId);
+        console.log(' removing ' + elem.DT_RowId);
         return elem.DT_RowId !== value;
     });
 };
 
 
 function initListAuth() {
-    initializeAuth(function (email) {
+    initializeAuth(function(email) {
         setHeader(email);
         setSideNav(email);
         populateList(email);
-    })
+    });
 }
 
 function countProperties(obj) {
@@ -65,6 +65,7 @@ function populateList(email) {
         { mData: "DateCreated", sTitle: "Date Created", sClass:"hidden-xs" },
         {
             sDefaultContent: "0",
+            //mData:null,
             mRender: function (data, type, row) {
                 if(type=="display"){
                     console.log(JSON.stringify(row));
@@ -121,32 +122,32 @@ function populateList(email) {
 
                     initializeAuth(function (email) {
                         getUserIdByEmail(email, function (uid) {
-                            userRef.child(uid).once('value', function (snapShot) {
+                            userRef.child(uid).once('value', function(snapShot) {
 
                                 var lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/');
 
-                                    var name = data.data.Name;
-                                    var description = data.data.Description;
-                                    obj.Name = name;
-                                    obj.Description = description;
-                                    obj.DateModified = getTodaysDate();
-                                    obj.DateCreated = getTodaysDate();
-                                    lockerPlansRef.off('child_changed', lockersPlansChanged);
-                                    var planId = plansRef.push(obj, function (err) {
-                                        if (!err) {
-                                            lockerPlansRef.child(planId).set(Firebase.ServerValue.TIMESTAMP, function (err) {
-                                                if (!err) {
-                                                    lockerPlansRef.on('child_changed', lockersPlansChanged);
-                                                    successCallback({ "id": planId });
-                                                }
+                                var name = data.data.Name;
+                                var description = data.data.Description;
+                                obj.Name = name;
+                                obj.Description = description;
+                                obj.DateModified = getTodaysDate();
+                                obj.DateCreated = getTodaysDate();
+                                lockerPlansRef.off('child_added', lockersPlansChanged);
+                                var planId = plansRef.push(obj, function(err) {
+                                    if (!err) {
+                                        lockerPlansRef.child(planId).set(Firebase.ServerValue.TIMESTAMP, function(err) {
+                                            if (!err) {
+                                                lockerPlansRef.on('child_changed', lockersPlansChanged);
+                                                successCallback({ "id": planId });
+                                            }
 
-                                            })
-                                        }
+                                        });
+                                    }
 
-                                   }).name();
+                                }).name();
 
-                            })           
-                            
+                            });
+
                         });
                     });
                 }
@@ -165,14 +166,14 @@ function populateList(email) {
                                 obj.DateModified = getTodaysDate();
 
                                 try {
-                                    lockerPlansRef.parent().off('child_changed', lockersPlansChanged);
+                                    lockerPlansRef.off('child_changed', lockersPlansChanged);
                                     //console.log('userPlansRef.parent() is ' + userPlansRef.parent().toString());
                                     plansRef.child(id).update(obj, function (err) {
                                         if (!err) {
                                             //console.log('setting ' + err);
                                             lockerPlansRef.set(Firebase.ServerValue.TIMESTAMP, function (err) {
 
-                                                lockerPlansRef.parent().on('child_changed', lockersPlansChanged);
+                                                lockerPlansRef.on('child_changed', lockersPlansChanged);
                                                 successCallback({ "id": id });
 
 
@@ -181,7 +182,7 @@ function populateList(email) {
 
                                         }
                                         else {
-                                            lockerPlansRef.parent().on('child_changed', lockersPlansChanged);
+                                            lockerPlansRef.on('child_changed', lockersPlansChanged);
                                             console.log('error occured editing plans ');
                                             successCallback({ "id": id });
                                         }
@@ -191,7 +192,7 @@ function populateList(email) {
 
 
                                 } catch (e) {
-                                    lockerPlansRef.parent().on('child_changed', lockersPlansChanged);
+                                    lockerPlansRef.on('child_changed', lockersPlansChanged);
                                     console.log('an error ocured ' + JSON.stringify(e));
                                 }
 
@@ -208,21 +209,21 @@ function populateList(email) {
                     
                 }
                 else if (data.action === 'remove') {
-                    
-                    initializeAuth(function (email) {
-                        getUserIdByEmail(email, function (uid) {
-                            userRef.child(uid).once('value', function (snapShot) {
+
+                    initializeAuth(function(email) {
+                        getUserIdByEmail(email, function(uid) {
+                            userRef.child(uid).once('value', function(snapShot) {
 
                                 var lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/');
                                 var r = [];
-                                lockerPlansRef.parent().off('child_removed', lockersPlansRemoved);
-                                plansRef.child(data.data[0]).remove(function (err) {
+                                lockerPlansRef.off('child_removed', lockersPlansRemoved);
+                                plansRef.child(data.data[0]).remove(function(err) {
                                     if (!err) {
-                                        lockerPlansRef.child(data.data[0]).remove(function (err) {
+                                        lockerPlansRef.child(data.data[0]).remove(function(err) {
                                             if (!err) {
                                                 r = jQuery.removeFromArray(data.data[0], records);
                                                 records = r;
-                                                lockerPlansRef.parent().on('child_removed', lockersPlansRemoved);
+                                                lockerPlansRef.on('child_removed', lockersPlansRemoved);
                                                 successCallback({ "id": null });
                                             }
                                         });
@@ -231,12 +232,11 @@ function populateList(email) {
                                 });
 
                             });
-                           
-                   
 
-                        })
-                    })
-                    
+
+                        });
+                    });
+
                 }
                
                
@@ -267,11 +267,14 @@ function populateList(email) {
 
         getUserIdByEmail(email, function (uid) {
           
-            initializeDataTable();
+            //initializeDataTable();
             userRef.child(uid).once('value', function (snapShot) {
 
-                lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/');
+                var lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/');
+                lockerPlansRef.once('value', function(snap) {
+                    numOfPlans = snap.numChildren();
 
+                });
                 //userPlansRef = userRef.child(uid + '/Plans/');
 
                 lockerPlansRef.on('child_added', lockersPlansAdded);
@@ -286,34 +289,32 @@ function populateList(email) {
 }
 
 
-
-
-var lockersPlansAdded = function (snapShot) {
+var lockersPlansAdded = function(snapShot) {
     console.log('lockersPlansAdded executing');
-    plansRef.child(snapShot.name()).once("value", function (childSnapShot) {
+    plansRef.child(snapShot.name()).once("value", function(childSnapShot) {
 
         var o = childSnapShot.val();
         o.DT_RowId = childSnapShot.name();
 
         records.push(o);
 
-        initializeDataTable();
+        if(records.length===numOfPlans)
+            initializeDataTable();
 
     });
-}
+};
 
 
-
-var lockersPlansChanged = function (snapShot) {
+var lockersPlansChanged = function(snapShot) {
     console.log('changed');
-    
-    
-    plansRef.child(snapShot.name()).on("value", function (childSnapShot) {
+
+
+    plansRef.child(snapShot.name()).on("value", function(childSnapShot) {
         //console.log('plan changed ' + JSON.stringify(childSnapShot.val()));
         //console.log('record length ' + records.length);
         var o = childSnapShot.val();
         var i = 0;
-        $.each(records, function () {
+        $.each(records, function() {
             //console.log('this dtrowid ' + this.DT_RowId + ' snap ' + childSnapShot.name());
             //console.log('snap name ' + childSnapshot.name());
             if (this.DT_RowId == childSnapShot.name()) {
@@ -330,26 +331,27 @@ var lockersPlansChanged = function (snapShot) {
 
     });
 
-}
+};
 
-var lockersPlansRemoved = function (snapShot) {
-   //console.log('record length before ' + records.length);
-   var r = [];
-    
-    
-        plansRef.child(snapShot.name()).on("value", function (childSnapShot) {
-            //console.log('value ' + childSnapShot.name());
+var lockersPlansRemoved = function(snapShot) {
+    console.log('record length before ' + records.length);
+    var r = [];
 
-            r = jQuery.removeFromArray(childSnapShot.name(), records);
-            //console.log('record length after ' + r.length);
-            records = r;
-            initializeDataTable();
-        });
 
-        
-}
+    plansRef.child(snapShot.name()).on("value", function(childSnapShot) {
+        //console.log('value ' + childSnapShot.name());
+
+        r = jQuery.removeFromArray(childSnapShot.name(), records);
+        //console.log('record length after ' + r.length);
+        records = r;
+        initializeDataTable();
+    });
+
+
+};
 
 function initializeDataTable() {
+    console.log('initialized');
     oTable = $('#datatable-table').dataTable({
         "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
         "aaData": records,
