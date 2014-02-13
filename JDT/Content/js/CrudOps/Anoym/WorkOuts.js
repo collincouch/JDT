@@ -10,6 +10,7 @@ var columns;
 var userId;
 var lockerId;
 var email;
+var numWorkOuts = 0;
 
 jQuery.removeFromArray = function (value, arr) {
     //console.log('object to be removed ' + JSON.stringify(value));
@@ -62,7 +63,7 @@ function populateList(email) {
         mData:null,
         mRender: function (data, type, row) {
             //console.log(row);
-            var returnVal = row.Exercises == null ? "<a href=\"/Exercises/Index/" + row.DT_RowId + "\">0</a>" : "<a href=\"/Exercises/Index/" + row.DT_RowId + "\">" + countProperties(row.Exercises) + "</a>";
+            var returnVal = row.Exercises === "undefined" ? "<a href=\"/Exercises/Index/" + row.DT_RowId + "\">0</a>" : "<a href=\"/Exercises/Index/" + row.DT_RowId + "\">" + countProperties(row.Exercises) + "</a>";
             return returnVal;
         },
         "aTargets": [4]
@@ -70,7 +71,7 @@ function populateList(email) {
         {
             mData:null,
             mRender: function (data, type, row) {
-                console.log('in locker: ' + row.InLocker);
+                //console.log('in locker: ' + row.InLocker);
                 var showHideAdd="";
                 var showHideRemove = "";
                 if (row.InLocker === undefined) {
@@ -97,7 +98,7 @@ function populateList(email) {
     ];
 
     getUserIdByEmail(email, function (uid) {
-        console.log('uid: ' + uid);
+        //console.log('uid: ' + uid);
         //initializeDataTable();
         //console.log('asdfsadf');
         //planWorkOutsRef = plansRef.child(planName + '/WorkOuts/');
@@ -108,6 +109,18 @@ function populateList(email) {
             lockerId = snapShot.val().LockerId;
            
         });
+
+        workOutsRef.once('value', function(snap) {
+            numWorkOuts = snap.numChildren();
+        });
+
+        console.log('number of work outs with exercises: ' + numWorkOuts);
+
+
+        if (numWorkOuts === 0)
+            initializeDataTable();
+
+       
         workOutsRef.on('child_added', workOutsAdded);
 
         workOutsRef.on('child_changed', workOutsChanged);
@@ -131,7 +144,7 @@ var initDataTable = function pushAndInitTable(obj) {
 var workOutsAdded = function(snapShot, callback) {
 
 
-    if (snapShot.hasChild('Exercises')) {
+    //if (snapShot.hasChild('Exercises')) {
         var o = snapShot.val();
 
         o.DT_RowId = snapShot.name();
@@ -148,10 +161,12 @@ var workOutsAdded = function(snapShot, callback) {
                 }
 
             }
-            callback(initDataTable(o));
+            records.push(o);
+            if (records.length === numWorkOuts)
+                initializeDataTable();
         });
 
-    }
+    //}
 
 
 };

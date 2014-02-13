@@ -7,7 +7,7 @@ var root = new Firebase('https://jdt.firebaseio.com');
 var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
 var lockersRef = new Firebase('https://jdt.firebaseio.com/Lockers/');
 var plansRef = new Firebase('https://jdt.firebaseio.com/Plans/');
-var numOfPlans;
+var numOfPlans=0;
 var records = [];
 var columns;
 
@@ -70,7 +70,7 @@ function populateList(email) {
                 if(type=="display"){
                     console.log(JSON.stringify(row));
                     //console.log(data[3]);
-                var returnVal = row.WorkOuts == null ? "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">0</a>" : "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">" + countProperties(row.WorkOuts) + "</a>";
+                var returnVal = row.WorkOuts === undefined ? "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">0</a>" : "<a href=\"/WorkOuts/Index/" + row.DT_RowId + "\">" + countProperties(row.WorkOuts) + "</a>";
                 return returnVal;
                 }
             },
@@ -273,6 +273,8 @@ function populateList(email) {
                 var lockerPlansRef = lockersRef.child(snapShot.val().LockerId + '/ContentCreated/Plans/');
                 lockerPlansRef.once('value', function(snap) {
                     numOfPlans = snap.numChildren();
+                    if (numOfPlans === 0)
+                        initializeDataTable();
 
                 });
                 //userPlansRef = userRef.child(uid + '/Plans/');

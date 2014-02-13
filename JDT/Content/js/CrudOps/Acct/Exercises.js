@@ -7,6 +7,7 @@ var exercisesRef = new Firebase('https://jdt.firebaseio.com/Exercises/');
 var workOutExercises = new Firebase('https://jdt.firebaseio.com/WorkOuts/' + workOutName + '/Exercises/');
 var records = [];
 var columns;
+var numExercises=0;
 
 jQuery.removeFromArray = function (value, arr) {
     //console.log('object to be removed ' + JSON.stringify(value));
@@ -17,11 +18,11 @@ jQuery.removeFromArray = function (value, arr) {
 };
 
 function initListAuth() {
-    initializeAuth(function (email) {
+    initializeAuth(function(email) {
         setHeader(email);
         setSideNav(email);
         populateList(email);
-    })
+    });
 }
 
 function countProperties(obj) {
@@ -198,10 +199,10 @@ function populateList(email) {
                         obj.RecDuration = data.data.RecDuration;
 
                     try {
-                        console.log(exercisesRef.child(id).toString());
+                        //console.log(exercisesRef.child(id).toString());
                         workOutExercises.off('child_changed', workOutsExercisesChanged);
                         exercisesRef.child(id).update(obj, function (err) {
-                            console.log('test');
+                            //console.log('test');
                             workOutExercises.child(id).set(Firebase.ServerValue.TIMESTAMP, function (err) {
                                 if (!err) {
                                     workOutExercises.on('child_changed', workOutsExercisesChanged);
@@ -237,7 +238,7 @@ function populateList(email) {
                            
                         });
                     } catch (e) {
-                        workOutExercises.on('child_removed', workOutExercisesRefRemoved);
+                        workOutExercises.on('child_removed', workOutsExercisesRemoved);
                     }
  
                 })
@@ -267,7 +268,12 @@ function populateList(email) {
   
     getUserIdByEmail(email, function (uid) {
 
-        initializeDataTable();
+        workOutExercises.once('value', function (snap) {
+            numExercises = snap.numChildren();
+            //console.log('numExercises ' + numExercises);
+            if (numExercises === 0)
+                initializeDataTable();
+        });
 
         workOutExercises.on('child_added', workOutsExercisesAdded);
 
@@ -280,19 +286,20 @@ function populateList(email) {
     }
 
 
-var workOutsExercisesAdded = function (snapShot) {
+var workOutsExercisesAdded = function(snapShot) {
     console.log('added');
-    exercisesRef.child(snapShot.name()).once("value", function (childSnapShot) {
+    exercisesRef.child(snapShot.name()).once("value", function(childSnapShot) {
 
         var o = childSnapShot.val();
         o.DT_RowId = childSnapShot.name();
 
         records.push(o);
 
-        initializeDataTable();
+        if(numExercises===records.length)
+            initializeDataTable();
 
     });
-}
+};
 
 var workOutsExercisesChanged = function (snapShot) {
     console.log('changed');

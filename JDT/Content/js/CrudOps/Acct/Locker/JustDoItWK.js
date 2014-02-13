@@ -3,7 +3,8 @@ var editor;
 var oTable;
 var userLockersRef;
 var pathname = window.location.pathname.split("/");
-var workOutName = pathname[pathname.length - 1];
+var workOutName = pathname[pathname.length - 2];
+var selectedDate = pathname[pathname.length - 1];
 //var rootRef = new Firebase('https://jdt.firebaseio.com/');
 var recordedSetsRef = new Firebase('https://jdt.firebaseio.com/Sets/');
 var userRef = new Firebase('https://jdt.firebaseio.com/Users/user/');
@@ -17,10 +18,12 @@ var lockerId;
 var arrMaster = [];
 var columns;
 var workOutEx = [];
-var numRecordedSets = 0;
+var numSets = 0;
+var numExercises = 0;
 var arrRecordedSets = [];
 var recMaxSets;
 var dateOfWorkOut;
+var parsedDate;
 
 function initListAuth() {
     
@@ -109,10 +112,7 @@ function initListAuth() {
                                 //console.log('recordedSetId: ' + recordedSetId);
                                 //console.log('reps ' + $('#txtReps_' + key + '_Set' + (i + 1)).val());
                                 //console.log('act: ' + $(this).data("act"));
-                                if (recordedSetId == "0")
-                                    createSet(key, set, weight, reps);
-                                else
-                                    updateSet(key, set, weight, reps, recordedSetId);
+                                updateSet(key, set, weight, reps, recordedSetId);
                             }
                             $('.act_' + key + '_Set' + (i + 1)).toggle();
                             $('.wght_' + key + '_Set' + (i + 1)).toggle();
@@ -188,30 +188,44 @@ function setButtonAttributes(tableid,arrSets) {
 
 
     });
-    console.log('testing');
+    //console.log('testing');
     $.each(arrSets, function (i, v) {
         var set = (i + 1);
-        $('.act_' + tableid + '_Set' + set).on('click', function (event) {
+        $('.act_' + v.DT_RowId).on('click', function (event) {
             event.preventDefault();
+            console.log('DT_RowId ' + v.DT_RowId);
             var action = $(this).data("act").toUpperCase();
             if (action == "SAVE") {
 
                 
-                var reps = $('#txtReps_' + tableid + '_Set' + set).val();
-                var weight = $('#txtWeight_' + tableid + '_Set' + set).val();
+                var reps = $('#txtReps_' + v.DT_RowId).val();
+                var weight = $('#txtWeight_' + v.DT_RowId).val();
 
 
                 var recordedSetId = $(this).data("recordedsetid");
-                console.log('recordedSetId: ' + recordedSetId);
+                //console.log('recordedSetId: ' + recordedSetId);
                 //console.log('reps ' + $('#txtReps_' + key + '_Set' + (i + 1)).val());
                 //console.log('act: ' + $(this).data("act"));
                
                 updateSet(tableid, set, weight, reps, recordedSetId);
             }
+            if (action == "CANCEL") {
+
+
+                $('#txtReps_' + v.DT_RowId).val("");
+                $('#txtWeight_' + v.DT_RowId).val("");
+
+
+                //console.log('recordedSetId: ' + recordedSetId);
+                //console.log('reps ' + $('#txtReps_' + key + '_Set' + (i + 1)).val());
+                //console.log('act: ' + $(this).data("act"));
+
+                
+            }
             //console.log(tableid + ' Set: ' + set);
-            $('.act_' + tableid + '_Set' + set).toggle();
-            $('.wght_' + tableid + '_Set' + set).toggle();
-            $('.reps_' + tableid + '_Set' + set).toggle();
+            $('.act_' + v.DT_RowId).toggle();
+            $('.wght_' + v.DT_RowId).toggle();
+            $('.reps_' + v.DT_RowId).toggle();
         });
     });
 }
@@ -223,8 +237,7 @@ function populateList(email, callback) {
 
 
     getUserIdByEmail(email, function(uid) {
-        var numOfExercises = 0;
-        
+   
         userRef.
             child(uid).
             once('value', function(snapShot) {
@@ -243,42 +256,20 @@ function populateList(email, callback) {
                                 $('#workOutTitle').append(workOutSnap.val().Name + '<small>' + description + '</small>');
 
 
-                                workOutSnap.
-                                    child('Exercises').
-                                    forEach(function(exerciseSnapShot) {
-                                        //console.log(exerciseSnapShot.name());
-                                        var r = [];
-                                    exercisesRef.child(exerciseSnapShot.name()).
-                                        on('value', function (exerciseChildSnapShot) { 
-                                    recMaxSets = exerciseChildSnapShot.val().RecMaxSets;
-                                            recMaxSets = exerciseChildSnapShot.val().RecMaxSets;
-                                           
-                                            var target = exerciseChildSnapShot.val().RecMinReps + ' - ' + exerciseChildSnapShot.val().RecMaxReps;
-                                            $('#accordion3').
-                                                append(renderTable(exerciseChildSnapShot.name(), exerciseChildSnapShot.val().Name, target));
-                                            
-                                            
+                                var workOutExRef = workOutsRef.
+                                    child(workOutName).
+                                    child('Exercises');
 
-                                            console.log('locker ' + lockerId);
+                                parsedDate = selectedDate.replace(/_/g, ':');
+                            //console.log('parsed Date ' + parsedDate);
+                            workOutExRef.once('value', function(snap) {
+                                populateDataTable();
+                                workOutExRef.on('child_added', exerciseAdded);
 
-  
-                                            lockersRef.
-                                               child(lockerId + '/JustDoThis/WorkOuts/' + workOutName + '/' + dateOfWorkOut + '/Exercises/' + exerciseChildSnapShot.name() + '/Sets/').
-                                               on('child_added', recordedSetAdded);
+                            });
 
-                                            lockersRef.
-                                                child(lockerId + '/JustDoThis/WorkOuts/' + workOutName + '/' + dateOfWorkOut + '/Exercises/' + exerciseChildSnapShot.name() + '/Sets/').
-                                                on('child_changed', recordedSetChanged);
-
-                                            });
-                                           
-                                            
-                                    });
-                                        
-                                        
-
-                                    //});
-                                });
+      
+                        });
 
                            
                     });
@@ -306,7 +297,7 @@ function updateSet(exerciseId, set, weight, reps,recordedSetId) {
        
             //z.off('child_changed', recordedSetChanged);
         recordedSetsRef.
-            child(dateOfWorkOut).
+            child(parsedDate).
                 child(recordedSetId).
                 update(o, function(err) {
                     if (!err) {
@@ -317,7 +308,7 @@ function updateSet(exerciseId, set, weight, reps,recordedSetId) {
                             child('JustDoThis').
                             child('WorkOuts').
                             child(workOutName).
-                            child(dateOfWorkOut).
+                            child(parsedDate).
                             child('Exercises').
                             child(exerciseId).
                             child('Sets').
@@ -339,7 +330,7 @@ function updateSet(exerciseId, set, weight, reps,recordedSetId) {
     });
 }
 
-function renderTable(exerciseId, exerciseName, target) {
+function renderAccordion(exerciseId, exerciseName, target) {
    // console.log(target);
     var s = "<div class=\"panel\">"
             + "<div class=\"row panel-heading\">"
@@ -419,7 +410,7 @@ function populateDataTable()
         //sDefaultContent: "<input type=\"text\" class=\"wght_\" id=\"txtWeight_\" disabled=\"disabled\" size=\"2\" maxlength=\"2\" width=\"20px\" />",
         mData: null,
         mRender: function (data, type, row) {
-            var returnVal = "<div class=\"wght_" + row.ExerciseId + " wght_" + row.DT_RowId + "\"  style=\"display: none\">"
+            var returnVal = "<div class=\"wght_" + row.DT_RowId + "\"  style=\"display: none\">"
                 + "<input type=\"text\" class=\"txtwght_" + row.ExerciseId + "\" id=\"txtWeight_" + row.DT_RowId + "\" value=\"" + row.Weight + "\" size=\"2\" maxlength=\"2\" width=\"20px\" /></div>"
              + "<div class=\"wght_" + row.ExerciseId + " wght_" + row.DT_RowId + "\"\">" + row.Weight + "</div>";
             return returnVal;
@@ -430,7 +421,7 @@ function populateDataTable()
         //sDefaultContent: "<input type=\"text\" class=\"reps_\" disabled=\"disabled\" id=\"txtReps_\" size=\"2\" maxlength=\"2\" width=\"20px\" />",
         mData: null,
         mRender: function (data, type, row) {
-            var returnVal = "<div class=\"reps_" + row.ExerciseId + " reps_" + row.DT_RowId + "\"  style=\"display: none\">"
+            var returnVal = "<div class=\"reps_" + row.DT_RowId + "\"  style=\"display: none\">"
                 + "<input type=\"text\" class=\"txtreps_" + row.ExerciseId + "\" id=\"txtReps_" + row.DT_RowId + "\" value=\"" + row.Reps + "\"  size=\"2\" maxlength=\"2\" width=\"20px\" /></div>"
             + "<div class=\"reps_" + row.ExerciseId + " reps_" + row.DT_RowId + "\">" + row.Reps +"</div>";
             return returnVal;
@@ -445,10 +436,13 @@ function populateDataTable()
         mData:null,
         mRender: function (data, type, row) {
             var returnVal;
-            returnVal = "<div data-act=\"Save\" data-recordedsetid=\"" + row.RecordedSetId + "\" class=\"act_" + row.DT_RowId + " act_" + row.ExerciseId + "\" style=\"display:none\"><a href=\"\">"
+            returnVal = "<div data-act=\"Save\" data-recordedsetid=\"" + row.DT_RowId + "\" class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
                 + "<span class=\"badge badge-success\">Save</span>"
                 + "</a></div>"
-                + "<div data-act=\"Edit\" class=\"act_" + row.DT_RowId + " act_" + row.ExerciseId + "\"><a href=\"\">"
+                + "<div data-act=\"Cancel\" data-recordedsetid=\"" + row.DT_RowId + "\" class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
+                + "<span class=\"badge badge-information\">Cancel</span>"
+                + "</a></div>"
+                + "<div data-act=\"Edit\" class=\"act_" + row.DT_RowId + "\"><a href=\"\">"
                 + "<span class=\"badge badge-warning\">Edit</span>"
                 + "</a></div>";
             return returnVal;
@@ -464,10 +458,7 @@ function populateDataTable()
 
 }
 
-
-
-
-function initializeDataTable(tableId, rows, callback) {
+function initializeDataTable(tableId, rows,callback) {
     //initializeStopWatch(tableId);
     //console.log('rows length ' + rows.length);
     oTable = $('#tbl_' + tableId).dataTable({
@@ -478,81 +469,102 @@ function initializeDataTable(tableId, rows, callback) {
             "bFilter": false,
             "bLengthChange": false,
         "bAutoWidth":false,
-        });
+    });
 
     if (oTable != null)
-        callback(tableId);
-}
-
-function pushAndInitTable(obj,exerciseId) {
-   
-
-    arrRecordedSets.push(obj);
-    //console.log('test');
-    initializeDataTable(exerciseId,arrRecordedSets, function(snapper) {
-        //console.log('data table initialized ' + exerciseId);
-        setButtonAttributes(exerciseId, arrRecordedSets);
-    });
+        callback();
 
 }
 
-var recordedSetAdded = function(recordedSetSnapShot,callback) {
-    console.log('recorded set added');
-    recordedSetsRef.
-        child(dateOfWorkOut).
-        child(recordedSetSnapShot.name()).
-        once('value', function(recordedSetChildSnap) {
-            //console.log('recordedSetSnapShotName ' + recordedSetSnapShot.name());
-            var o= {};
-            //console.log('fffffff');
-            o = recordedSetChildSnap.val();
-            //console.log('eeeee ' + JSON.stringify(o));
-            o.RecordedSetId = recordedSetSnapShot.name();
-            o.DT_RowId = o.ExerciseId + "_Set" + o.Set;
-            //arrRecordedSets.push(o);
-            //console.log('sdfsdf');
-            callback(pushAndInitTable(o,o.ExerciseId));
-        });
+
+
+var exerciseAdded = function(snapShot) {
+    var exerciseId = snapShot.name();
+    var rows = [];
+    var numSets = 0;
+
     
+    exercisesRef.child(exerciseId).once('value', function(childSnapShot) {
+        var target = childSnapShot.val().RecMinReps + ' - ' + childSnapShot.val().RecMaxReps;
+        $('#accordion3').
+            append(renderAccordion(childSnapShot.name(),
+            childSnapShot.val().Name, target));
+
+        var exerciseSetsRef = lockerRef.
+        child(lockerId).
+            child("JustDoThis").
+            child("WorkOuts").
+            child(workOutName).
+            child(parsedDate).
+            child("Exercises").
+            child(exerciseId).
+            child("Sets");
+
+        //console.log(exerciseSetsRef.toString());
+            
+            //query exercises node to get number of sets 
+        exerciseSetsRef.
+            once('value', function (snap) {
+                numSets = snap.numChildren();
+                //console.log('num of sets ' + numSets);
+            });
+
+
+        
+        exerciseSetsRef.on('child_added', function (setSnap) {
+            recordedSetsRef.
+                child(parsedDate).
+                child(setSnap.name()).
+                once('value', function (childSnap) {
+                var o;
+                o = childSnap.val();
+                //console.log(JSON.stringify(o));
+                o.DT_RowId = childSnap.name();
+                rows.push(o);
+                
+                if (rows.length === numSets) {
+                    //console.log('numSets ' + numSets + ' exerciseId ' + exerciseId);
+                    initializeDataTable(exerciseId, rows, function() {
+                        setButtonAttributes(exerciseId, rows);
+                    });
+                }
+            });
+           
+        });
+
+        exerciseSetsRef.on('child_changed', function (setSnap) {
+            recordedSetsRef.
+                child(parsedDate).
+                child(setSnap.name()).
+                once('value', function(childSnap) {
+                    var o = childSnap.val();
+                    var i = 0;
+
+                    var table = $('#tbl_' + exerciseId).dataTable();
+                    rows = table.fnGetData();
+                console.log('rows length ' + rows.length);
+                    $.each(rows, function() {
+                        if (this.DT_RowId == childSnap.name()) {
+                            console.log('found it');
+                            o = childSnap.val();
+                            o.DT_RowId = childSnap.name();
+                            return false;
+
+                        }
+                        console.log('asdfsdaf ' + i);
+                        i++;
+                    });
+
+                    rows[i] = o;
+
+                    initializeDataTable(exerciseId, rows, function() {
+                        setButtonAttributes(exerciseId, rows);
+                    });
+                });
+
+        });
+
+
+    });
 };
 
-var recordedSetChanged = function (recordedSetSnapShot) {
-    
-    console.log('recorded set changed');
-    //console.log('aadata ' + oTable.fnGetData());
-    //console.log('exercise name ' + JSON.stringify(recordedSetSnapShot.val()));
-
-
-    recordedSetsRef.
-        child(dateOfWorkOut).
-        child(recordedSetSnapShot.name()).
-        once('value', function (recordedSetChildSnap) {
-        //console.log('recordedSetSnapShotName ' + recordedSetSnapShot.name());
-        var o;
-        var arrRecSets = [];
-        o = recordedSetChildSnap.val();
-        o.RecordedSetId = recordedSetSnapShot.name();
-        oTable = $('#tbl_' + o.ExerciseId).dataTable();
-        //console.log('fsdf ' + JSON.stringify(o));
-
-        var aData = oTable.fnGetData();
-        $.each(aData, function (index, value) {
-
-            if (value.RecordedSetId == recordedSetSnapShot.name()) {
-                value.Weight = o.Weight;
-                value.Reps = o.Reps;
-               // console.log('found it');
-            }
-            arrRecSets.push(value);
-            //console.log('value ' + JSON.stringify(value));
-        });
-        if (arrRecSets.length == aData.length) {
-            initializeDataTable(o.ExerciseId, arrRecSets, function(x) {
-                setButtonAttributes(x, arrRecSets);
-
-            });
-        }
-        
-    });
-
-}
