@@ -193,16 +193,18 @@ function setButtonAttributes(tableid,arrSets) {
         var set = (i + 1);
         $('.act_' + v.DT_RowId).on('click', function (event) {
             event.preventDefault();
-            console.log('DT_RowId ' + v.DT_RowId);
+            //console.log('DT_RowId ' + v.DT_RowId);
             var action = $(this).data("act").toUpperCase();
+            var reps;
+            var weight;
             if (action == "SAVE") {
 
                 
-                var reps = $('#txtReps_' + v.DT_RowId).val();
-                var weight = $('#txtWeight_' + v.DT_RowId).val();
+                reps = $('#txtReps_' + v.DT_RowId).val();
+                weight = $('#txtWeight_' + v.DT_RowId).val();
 
 
-                var recordedSetId = $(this).data("recordedsetid");
+                var recordedSetId = v.DT_RowId;
                 //console.log('recordedSetId: ' + recordedSetId);
                 //console.log('reps ' + $('#txtReps_' + key + '_Set' + (i + 1)).val());
                 //console.log('act: ' + $(this).data("act"));
@@ -211,9 +213,12 @@ function setButtonAttributes(tableid,arrSets) {
             }
             if (action == "CANCEL") {
 
+                reps = $('#reps_' + v.DT_RowId).text();
+                weight = $('#wght_' + v.DT_RowId).text();
+                
 
-                $('#txtReps_' + v.DT_RowId).val("");
-                $('#txtWeight_' + v.DT_RowId).val("");
+                $('#txtReps_' + v.DT_RowId).val(reps);
+                $('#txtWeight_' + v.DT_RowId).val(weight);
 
 
                 //console.log('recordedSetId: ' + recordedSetId);
@@ -412,7 +417,7 @@ function populateDataTable()
         mRender: function (data, type, row) {
             var returnVal = "<div class=\"wght_" + row.DT_RowId + "\"  style=\"display: none\">"
                 + "<input type=\"text\" class=\"txtwght_" + row.ExerciseId + "\" id=\"txtWeight_" + row.DT_RowId + "\" value=\"" + row.Weight + "\" size=\"2\" maxlength=\"2\" width=\"20px\" /></div>"
-             + "<div class=\"wght_" + row.ExerciseId + " wght_" + row.DT_RowId + "\"\">" + row.Weight + "</div>";
+             + "<div class=\"wght_" + row.DT_RowId + "\" id=\"wght_" + row.DT_RowId + "\">" + row.Weight + "</div>";
             return returnVal;
         },
         "aTargets": [1]
@@ -423,7 +428,7 @@ function populateDataTable()
         mRender: function (data, type, row) {
             var returnVal = "<div class=\"reps_" + row.DT_RowId + "\"  style=\"display: none\">"
                 + "<input type=\"text\" class=\"txtreps_" + row.ExerciseId + "\" id=\"txtReps_" + row.DT_RowId + "\" value=\"" + row.Reps + "\"  size=\"2\" maxlength=\"2\" width=\"20px\" /></div>"
-            + "<div class=\"reps_" + row.ExerciseId + " reps_" + row.DT_RowId + "\">" + row.Reps +"</div>";
+            + "<div class=\"reps_" + row.DT_RowId + "\" id=\"reps_" + row.DT_RowId + "\">" + row.Reps +"</div>";
             return returnVal;
         },
         "aTargets": [2]
@@ -436,10 +441,10 @@ function populateDataTable()
         mData:null,
         mRender: function (data, type, row) {
             var returnVal;
-            returnVal = "<div data-act=\"Save\" data-recordedsetid=\"" + row.DT_RowId + "\" class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
+            returnVal = "<div data-act=\"Save\" class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
                 + "<span class=\"badge badge-success\">Save</span>"
                 + "</a></div>"
-                + "<div data-act=\"Cancel\" data-recordedsetid=\"" + row.DT_RowId + "\" class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
+                + "<div data-act=\"Cancel\" class=\"act_" + row.DT_RowId + "\" style=\"display:none\"><a href=\"\">"
                 + "<span class=\"badge badge-information\">Cancel</span>"
                 + "</a></div>"
                 + "<div data-act=\"Edit\" class=\"act_" + row.DT_RowId + "\"><a href=\"\">"
